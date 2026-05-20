@@ -1,12 +1,13 @@
 
 
 
-class Chromosome1Component : 
+class GenomeComponent : 
 
-    def __init__(self, connections1, connections2, bias1, bias2, function1, function2, nodes) :
+    def __init__(self, connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes) :
         self.connections = [connections1, connections2]
         self.biases = [bias1, bias2]
         self.functions = [function1, function2]
+        self.dominances =[dominance1, dominance2]
         self.nodes = nodes 
 
 class Chromosome2Component:

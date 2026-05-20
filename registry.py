@@ -13,8 +13,8 @@ class ComponentRegistry :
 
 
     # ADDER METHODS 
-    def add_chromosome1(self, entity_id, connections1, connections2, nodes) :
-        self.chromosome1_registry[entity_id] = Chromosome1Component(connections1, connections2, nodes)
+    def add_genome(self, entity_id, connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes) :
+        self.chromosome1_registry[entity_id] = GenomeComponent(connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes)
 
     def add_chromosome2(self, entity_id, sex1, sex2):
         self.chromosome2_registry[entity_id] = Chromosome2Component(sex1, sex2)      
