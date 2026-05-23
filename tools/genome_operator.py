@@ -8,6 +8,7 @@ class GenomeOperator:
         self.robot_simulator = robot_simulator
 
 
+
     def nodes_by_layer(self, shape_of_cppn) :
         node = 0 
         nodes_by_layer = []
@@ -20,6 +21,8 @@ class GenomeOperator:
         return nodes_by_layer
 
     def generate_first_generation_of_genome(self, nodes_by_layer) :
+
+        output_activation_function = lambda x : x
 
         connections1 = {}
         connections2 = {}
@@ -127,16 +130,17 @@ class GenomeOperator:
             for node in biases :
                 if np.random.uniform() > threshold_bias :
                     biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
+        list_of_keys = list(functions_pool.keys())
         for functions in genome.functions :
             for node in functions :
                 if node in genome.nodes[-1] :
                     continue 
                 if np.random.uniform() > threshold_function :
-                    choice = np.random.randint(0, len(functions_pool)-1) 
-                    new_function = functions_pool[choice]
+                    choice = np.random.randint(0, len(list_of_keys)-1) 
+                    new_function = functions_pool[list_of_keys[choice]]
                     while functions[node] == new_function :
-                        choice = np.random.randint(0, len(functions_pool)) 
-                        new_function = functions_pool[choice]
+                        choice = np.random.randint(0, len(list_of_keys)) 
+                        new_function = functions_pool[list_of_keys[choice]]
                     functions[node] = new_function
         for dominances in genome.dominances :
             for node in dominances :

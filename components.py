@@ -46,5 +46,6 @@ class BodyNetworkComponent :
 
 class BodyComponent : 
 
-    def __init__(self, body) :
+    def __init__(self, body, connections) :
         self.body = body 
+        self.connections = connections 

@@ -3,7 +3,7 @@ from components import *
 
 class ComponentRegistry :
     def __init__(self) :
-        self.chromosome1_registry = {}
+        self.genome_registry = {}
         self.chromosome2_registry = {}
         self.fitness_registry = {}
         self.cppn_registry = {}
@@ -14,7 +14,7 @@ class ComponentRegistry :
 
     # ADDER METHODS 
     def add_genome(self, entity_id, connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes) :
-        self.chromosome1_registry[entity_id] = GenomeComponent(connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes)
+        self.genome_registry[entity_id] = GenomeComponent(connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes)
 
     def add_chromosome2(self, entity_id, sex1, sex2):
         self.chromosome2_registry[entity_id] = Chromosome2Component(sex1, sex2)      
@@ -32,13 +32,13 @@ class ComponentRegistry :
         self.body_network_registry[entity_id] = BodyNetworkComponent(node_evals, input_nodes, output_nodes)
 
 
-    def add_body(self, entity_id,  body) :
-        self.body_registry [entity_id] = BodyComponent(body)
+    def add_body(self, entity_id,  body, connections) :
+        self.body_registry [entity_id] = BodyComponent(body, connections)
 
     # GETTER METHODS 
-    def get_chromosome1(self, entity_id) :
-        return self.chromosome1_registry[entity_id]
-    
+    def get_genome(self, entity_id) :
+        return self.genome_registry[entity_id]
+
     def get_chromosome2(self, entity_id):
         return self.chromosome2_registry[entity_id]
     
@@ -58,8 +58,8 @@ class ComponentRegistry :
         return self.body_registry[entity_id]
     
     # ADVANCED GETTER METHODS
-    def get_all_id_with_chromosome1(self) :
-        return self.chromosome1_registry.keys()
+    def get_all_id_with_genome(self) :
+        return self.genome_registry.keys()
     
     def get_all_id_with_chromosome2(self):
         return self.chromosome2_registry.keys()
@@ -82,8 +82,8 @@ class ComponentRegistry :
             self[key].clear()
 
     # MODIFYERS please give an object 
-    def modify_chromosome1(self, entity_id, other_chromosome1):
-        self.chromosome1_registry[entity_id] = other_chromosome1
+    def modify_genome(self, entity_id, other_genome):
+        self.genome_registry[entity_id] = other_genome
 
 
 
