@@ -11,11 +11,11 @@ class PhenotypeSystem :
     def __str__(self) :
         return "PhenotypeSystem, build the phenotype from the genome"
     
-    def __init__(self, config, entity_manager, genome_operator, network_operator, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator) :
+    def __init__(self, config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator) :
         self.config = config 
         self.entity_manager = entity_manager 
         self.genome_operator = genome_operator 
-        self.network_operator = network_operator
+        self.network_manager = network_manager
         self.substrate_builder = substrate_builder 
         self.phenotype_builder = phenotype_builder
         self.function_pool = function_pool

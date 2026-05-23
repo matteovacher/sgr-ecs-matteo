@@ -1,0 +1,66 @@
+import os
+import json  
+
+from entity_manager import EntityManager 
+from world import World 
+from systems.build_system import BuildSystem
+from systems.evaluation_system import EvaluationSystem
+from systems.reproduction_system import ReproductionSystem
+from phenotype_system import PhenotypeSystem
+
+from config import Config
+
+from tools.network_manager import NetworkManager
+from tools.func_pool import FunctionPool
+from tools.genome_operator import GenomeOperator
+from tools.hyper_encoding import PhenotypeBuilder
+from tools.parallel_tool import ParallelTool
+from tools.results_manager import ResultsManager
+from tools.robot_generator import RobotGenerator
+from tools.robot_simulator import RobotSimulator
+from tools.substrate import SubstrateBuilder
+
+
+
+
+
+
+def main():
+    entity_manager = EntityManager()
+    world = World()
+
+
+    config_path = input("\nEnter the path to the config file from the configs folder (can be just config.json) : ")
+    local_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    config_path_final = os.path.join(local_dir, "configs", config_path)
+    with open(config_path_final, 'r') as f : 
+        config = json.load(f)
+
+    config = Config(config)
+
+    results_manager = ResultsManager()
+    network_manager = NetworkManager(config)
+    function_pool = FunctionPool(config)
+    genome_operator = GenomeOperator(config)
+    substrate_builder = SubstrateBuilder(config)
+    phenotype_builder = PhenotypeBuilder()
+    robot_generator = RobotGenerator(config)
+    robot_simulator = RobotSimulator(config)
+    parallel_tool = ParallelTool(config)
+
+
+    build_system = BuildSystem(config, entity_manager, genome_operator, results_manager)
+    phenotype_system = PhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator)
+    evaluation_system = EvaluationSystem(config, robot_simulator, network_manager, parallel_tool)
+    reproduction_system = ReproductionSystem(entity_manager, config, genome_operator)
+
+    world.add_builder_system(build_system)
+    world.add_step_system(phenotype_system)
+    world.add_step_system(evaluation_system)
+    world.add_step_system(reproduction_system)
+
+    world.build()
+
+    for generation in range(config.generations) : 
+        world.step()
+

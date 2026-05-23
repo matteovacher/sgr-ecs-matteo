@@ -23,7 +23,6 @@ class PhenotypeBuilder :
         
 
     def _query_cppn_bias(self, cppn, coordinate1, max_bias, coordinate2 = [0, 0, 0, 0], bias = 1.0) :
-
         inputs = [*coordinate1, *coordinate2, bias]
         output = cppn.activate(cppn, inputs)
 

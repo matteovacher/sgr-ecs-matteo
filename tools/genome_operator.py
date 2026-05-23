@@ -3,9 +3,9 @@ import numpy as np
 
 class GenomeOperator:
 
-    def __init__(self, config, robot_simulator):
+    def __init__(self, config):
         self.config = config 
-        self.robot_simulator = robot_simulator
+
 
 
 

@@ -23,9 +23,9 @@
     "function_pool" : ["gaussian", "sin", "abs", "tanh"], 
 
     "n_steps" : 500, 
-    "number_of_reported_individuals" : 10 
+    "number_of_reported_individuals" : 10,
 
-
+    "cpus" : 4
 
 
 }
