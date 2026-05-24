@@ -1,5 +1,5 @@
 import numpy as np 
-
+import copy 
 
 class GenomeOperator:
 
@@ -41,21 +41,22 @@ class GenomeOperator:
                 for previous_node in previous_layer :
                     weight1 = np.random.uniform(-1, 1)
                     weight2 = np.random.uniform(-1, 1)
-                d1 = np.random.randint(0, 1)
-                d2 = np.random.randint(0, 1)
+                    connections1[(previous_node, node)] = weight1
+                    connections2[(previous_node, node)] = weight2
+                d1 = np.random.randint(0, 2)
+                d2 = np.random.randint(0, 2)
                 b1 = np.random.uniform(-1, 1)
                 b2 = np.random.uniform(-1, 1)
-                act_function1 = np.tanh()
-                act_function2 = np.tanh()
-                connections1[(previous_node, node)] = weight1
-                connections2[(previous_node, node)] = weight2
+
+                act_function1 = np.tanh
+                act_function2 = np.tanh
                 bias1[node] = b1
                 bias2[node] = b2 
                 activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function 
                 activation_functions2[node] = act_function2 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function 
                 dominance1[node] = d1
                 dominance2[node] = d2
-                previous_layer = nodes_by_layer[index_of_layer]
+            previous_layer = nodes_by_layer[index_of_layer]
         return connections1, connections2, bias1, bias2, activation_functions1, activation_functions2, dominance1, dominance2, nodes_by_layer
 
 
@@ -80,12 +81,12 @@ class GenomeOperator:
                         bias[node] = genome.biases[1][node]
                         functions[node] = genome.functions[1][node]
                     else :
-                        choice = np.random.randint(0, 1)
+                        choice = np.random.randint(0, 2)
                         connections[(previous_node, node)] = genome.connections[choice][(previous_node, node)]
                         bias[node] = genome.biases[choice][node]
                         functions[node] = genome.functions[choice][node]
 
-                previous_layer = genome.nodes[index_of_layer]
+            previous_layer = genome.nodes[index_of_layer]
 
         return connections, bias, functions
 
@@ -97,16 +98,16 @@ class GenomeOperator:
         dominances = []
 
 
-        choice1 = np.random.randint(0, 1)
-        connections_parent1 = genome1.connections[choice1] 
-        bias_parent1 = genome1.biases[choice1]
-        functions_parent1 = genome1.functions[choice1]
-        dominances_parent1 = genome1.dominances[choice1]
-        choice2 = np.random.randint(0, 1)
-        connections_parent2 = genome2.connections[choice2]
-        bias_parent2 = genome2.biases[choice2]
-        functions_parent2 = genome2.functions[choice2]
-        dominances_parent2 = genome2.dominances[choice2]
+        choice1 = np.random.randint(0, 2)
+        connections_parent1 = copy.deepcopy(genome1.connections[choice1])
+        bias_parent1 = copy.deepcopy(genome1.biases[choice1])
+        functions_parent1 = copy.deepcopy(genome1.functions[choice1])
+        dominances_parent1 = copy.deepcopy(genome1.dominances[choice1])
+        choice2 = np.random.randint(0, 2)
+        connections_parent2 = copy.deepcopy(genome2.connections[choice2])   
+        bias_parent2 = copy.deepcopy(genome2.biases[choice2])
+        functions_parent2 = copy.deepcopy(genome2.functions[choice2])
+        dominances_parent2 = copy.deepcopy(genome2.dominances[choice2])
 
         connections.append(connections_parent1)
         connections.append(connections_parent2)
@@ -124,19 +125,19 @@ class GenomeOperator:
     def mutate(self, genome, sigma_weight, sigma_bias, threshold_weight, threshold_bias, threshold_function, threshold_dominance, functions_pool) :
         for connections in genome.connections : # 2 ici 
             for connection in connections :
-                if np.random.uniform() > threshold_weight :
+                if np.random.uniform() < threshold_weight :
                     connections[connection] += np.random.normal(loc = 0, scale = sigma_weight)
         for biases in genome.biases :
             for node in biases :
-                if np.random.uniform() > threshold_bias :
+                if np.random.uniform() < threshold_bias :
                     biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
         list_of_keys = list(functions_pool.keys())
         for functions in genome.functions :
             for node in functions :
                 if node in genome.nodes[-1] :
                     continue 
-                if np.random.uniform() > threshold_function :
-                    choice = np.random.randint(0, len(list_of_keys)-1) 
+                if np.random.uniform() < threshold_function :
+                    choice = np.random.randint(0, len(list_of_keys)) 
                     new_function = functions_pool[list_of_keys[choice]]
                     while functions[node] == new_function :
                         choice = np.random.randint(0, len(list_of_keys)) 
@@ -144,8 +145,8 @@ class GenomeOperator:
                     functions[node] = new_function
         for dominances in genome.dominances :
             for node in dominances :
-                if np.random.uniform() > threshold_dominance :
-                    dominances[node] = 0 if dominances[node] == 1 else 0
+                if np.random.uniform() < threshold_dominance :
+                    dominances[node] = 0 if dominances[node] == 1 else 1
         
         return genome 
     

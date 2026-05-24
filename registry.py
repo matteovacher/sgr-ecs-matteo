@@ -76,6 +76,10 @@ class ComponentRegistry :
     def get_all_id_with_body(self) :
         return self.body_registry.keys()
     
+    # HAS METHODS
+    def has_controller_network(self, entity_id) :
+        return entity_id in self.controller_network_registry
+
     # CLEARER METHODS 
     def clear_all(self) :
         for key, _  in self.__dict__.items():

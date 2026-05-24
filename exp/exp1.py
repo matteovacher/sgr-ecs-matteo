@@ -6,7 +6,7 @@ from world import World
 from systems.build_system import BuildSystem
 from systems.evaluation_system import EvaluationSystem
 from systems.reproduction_system import ReproductionSystem
-from phenotype_system import PhenotypeSystem
+from systems.phenotype_system import PhenotypeSystem
 
 from config import Config
 
@@ -44,23 +44,27 @@ def main():
     genome_operator = GenomeOperator(config)
     substrate_builder = SubstrateBuilder(config)
     phenotype_builder = PhenotypeBuilder()
-    robot_generator = RobotGenerator(config)
+    robot_generator = RobotGenerator()
     robot_simulator = RobotSimulator(config)
     parallel_tool = ParallelTool(config)
 
 
     build_system = BuildSystem(config, entity_manager, genome_operator, results_manager)
-    phenotype_system = PhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator)
-    evaluation_system = EvaluationSystem(config, robot_simulator, network_manager, parallel_tool)
-    reproduction_system = ReproductionSystem(entity_manager, config, genome_operator)
+    phenotype_system = PhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager)
+    evaluation_system = EvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager)
+    reproduction_system = ReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager)
 
     world.add_builder_system(build_system)
     world.add_step_system(phenotype_system)
     world.add_step_system(evaluation_system)
     world.add_step_system(reproduction_system)
 
+    results_manager.add_results_path()
+    results_manager.begin_txt_file(world.all_systems)
+
     world.build()
 
     for generation in range(config.generations) : 
         world.step()
 
+    results_manager.save_results(world.registry, config)

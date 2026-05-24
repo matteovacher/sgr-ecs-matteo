@@ -2,6 +2,8 @@ import gymnasium as gym
 import math 
 import numpy as np 
 
+import evogym.envs
+
 from evogym.utils import get_full_connectivity 
 
 
@@ -11,13 +13,13 @@ class RobotSimulator:
 
 
 
-    def _get_env(self, robot ):
+    def _get_env(self, robot):
         connections = get_full_connectivity(robot)
         env = gym.make(self.config.env_name, body = robot, connections = connections)
         return env.unwrapped 
     
     def get_observation_size(self, robot) :
-        env = self._get_env(self, robot)
+        env = self._get_env(robot)
         observation, _ = env.reset()
         env.close()
         del env 
@@ -85,7 +87,7 @@ class RobotSimulator:
 
         env.close()
         del env 
-        print(f'Individual fitness : {fitness}')
-        print('----- End of simulation -----')
+        print(f'Individual fitness : {fitness}\n')
+        print('----- End of simulation -----\n')
         return images, fitness 
         

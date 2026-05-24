@@ -95,8 +95,8 @@ class SubstrateBuilder:
 
         body_shape = config.body_shape
         shape_of_substrate = [
-            [1, 1, 1, 1]
-            [2, body_shape[0], body_shape[1], 2]
+            [1, 1, 1, 1], 
+            [2, body_shape[0], body_shape[1], 2], 
             [3, body_shape[0], body_shape[1], 5]
         ]
         return shape_of_substrate 
@@ -104,8 +104,8 @@ class SubstrateBuilder:
     def extract_controller_network_shape(self, grid_input_size, config) :
         body_shape = config.body_shape
         controller_shape = [
-            [-1, grid_input_size, grid_input_size, 1]
-            [-2, grid_input_size//2, grid_input_size//2, body_shape[0]//2]
+            [-1, grid_input_size, grid_input_size, 1], 
+            [-2, grid_input_size//2, grid_input_size//2, body_shape[0]//2], 
             [-3, body_shape[0], body_shape[1], 1]
         ]
         return controller_shape

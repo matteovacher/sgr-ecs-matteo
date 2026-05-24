@@ -1,17 +1,13 @@
 import math 
 
 
-
-
-from tools import genome_operator
-
-
 class PhenotypeSystem :
 
     def __str__(self) :
         return "PhenotypeSystem, build the phenotype from the genome"
     
-    def __init__(self, config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator) :
+    def __init__(self, config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager) :
+        self.generation = 1
         self.config = config 
         self.entity_manager = entity_manager 
         self.genome_operator = genome_operator 
@@ -21,13 +17,17 @@ class PhenotypeSystem :
         self.function_pool = function_pool
         self.robot_generator = robot_generator
         self.robot_simulator = robot_simulator
-
+        self.results_manager = results_manager
     def process(self, registry) :
 
-        for entity_id in list(registry.get_all_id_with_genome()) : 
+        self.results_manager.start_generation(self.generation, self.config)
+        self.generation += 1
+
+        entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
+        for entity_id in entity_ids : 
             genome = registry.get_genome(entity_id)
             connections, bias, functions = self.genome_operator.dominance(genome)
-            node_evals, input_nodes, output_nodes = self.genome_operator.create_network(genome.nodes_by_layer, connections, bias, functions, sum(), reponse = 1)
+            node_evals, input_nodes, output_nodes = self.network_manager.create_network(genome.nodes, connections, bias, functions, sum, response = 1)
             registry.add_cppn(entity_id, node_evals, input_nodes, output_nodes)
 
             cppn = registry.get_cppn(entity_id)
@@ -35,7 +35,7 @@ class PhenotypeSystem :
             body_substrate = self.substrate_builder.shape_into_coordinates(body_substrate_shape)
             act_func = self.function_pool.pool["tanh"]
             out_act_func = lambda x : x
-            node_evals, input_nodes, output_nodes = self.phenotype_builder.create_phenotype_network(cppn, body_substrate, act_func, out_act_func, sum(), self.config.response, self.config.max_weight, self.config.max_bias)
+            node_evals, input_nodes, output_nodes = self.phenotype_builder.create_phenotype_network(cppn, self.network_manager, body_substrate, act_func, out_act_func, sum, self.config.response, self.config.max_weight, self.config.max_bias)
 
             registry.add_body_network(entity_id, node_evals, input_nodes, output_nodes)
 
@@ -53,7 +53,8 @@ class PhenotypeSystem :
             observation_size = self.robot_simulator.get_observation_size(robot_grid)
             grid_input_size = math.ceil(math.sqrt(observation_size))
             controller_substrate_shape = self.substrate_builder.extract_controller_network_shape(grid_input_size, self.config)
-            node_evals, input_nodes, output_nodes = self.phenotype_builder.create_phenotype_network(cppn, controller_substrate_shape, act_func, out_act_func, sum(), self.config.response, self.config.max_weight, self.config.max_bias)
+            controller_substrate = self.substrate_builder.shape_into_coordinates(controller_substrate_shape)
+            node_evals, input_nodes, output_nodes = self.phenotype_builder.create_phenotype_network(cppn, self.network_manager, controller_substrate, act_func, out_act_func, sum, self.config.response, self.config.max_weight, self.config.max_bias)
             registry.add_controller_network(entity_id, node_evals, input_nodes, output_nodes)
 
 

@@ -38,6 +38,7 @@ class ResultsManager :
         print('\n\n')
     
     def save_results(self, registry, config) :
+        time = time.time()
         if self.save == True : 
             save_config_path = os.path.join(self.abs_path_results, 'json', 'configs.json')
             with open(save_config_path, 'w') as f : 
@@ -49,8 +50,9 @@ class ResultsManager :
                 component_path = os.path.join(self.abs_path_results, 'pkl', '{}.pkl'.format(name))
                 with open(component_path, 'wb') as f : 
                     dill.dump(component_registry, f)
+            passed = time.time() - time
+            print(f'All results saved successfully in {passed:.3f} s.\n')
 
-                
             print('\n----- Saved Successfully -----\n\n')
 
     def begin_txt_file(self, systems) :
@@ -58,7 +60,7 @@ class ResultsManager :
         with open(txt_file_dir, 'a') as f :
             f.write('\nHere the different systems below are being used :\n')
             for system in systems :
-                f.write('\t' + system + '\n')
+                f.write('\t + {}\n'.format(system))
             f.write('\n\n')
 
 
@@ -72,7 +74,8 @@ class ResultsManager :
         result = '\n'
         result += '----- Running with the following config -----\n'
         result += '\n'
-        result += config + '\n'
+        for key, value in config.__dict__.items():
+            result += f'{key} : {value}\n'
         result += '\n'
         self._log(result)
 
@@ -83,9 +86,9 @@ class ResultsManager :
         result += '\n'
         self._log(result)
        
-    def start_generation(self, generation) :
+    def start_generation(self, generation, config) :
         self.time = time.time()
-        result = f'----- Starting generation number {generation} out of {self.config.generations} -----\n'
+        result = f'----- Starting generation number {generation} out of {config.generations} -----\n'
         result += '\n'
         self._log(result)
        
@@ -115,6 +118,8 @@ class ResultsManager :
        
     def deficient(self, number) :
         results = f'The number of deficient individuals on this generation is {number}. IE with an invalid body. '
+        results += '\n'
+        self._log(results)  
 
 
 
@@ -123,6 +128,7 @@ class ResultsManager :
         number = input('From which experiment ID do you want to get the results : ')
         local_dir =os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         results_dir = os.path.join(local_dir, 'results', '{}'.format(path), 'id_{}'.format(number))
+        self.results_dir = results_dir
         json_dir  = os.path.join(results_dir, 'json')
         pkl_dir = os.path.join(results_dir, 'pkl')
 

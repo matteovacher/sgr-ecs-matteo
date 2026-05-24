@@ -26,7 +26,7 @@ class NetworkManager :
                 inputs_of_node = []
                 for previous_node in previous_layer :
                     weight = connections[(previous_node, node)]
-                    inputs_of_node.append(previous_node, weight)
+                    inputs_of_node.append((previous_node, weight))
                 activation_function = functions[node]
                 node_bias = bias[node]
                 node_evals.append((node, activation_function, agg, node_bias, response, inputs_of_node))

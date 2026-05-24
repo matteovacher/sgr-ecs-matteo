@@ -1,5 +1,5 @@
 import numpy as np 
-import rqndom as rd 
+import random as rd 
 
 
 
@@ -8,11 +8,12 @@ class ReproductionSystem :
     def __str__(self) :
         return "ReproductionSystem, tournament is the selection process happening here"
     
-    def __init__(self, config, genome_operator, entity_manager, function_pool) :
+    def __init__(self, config, genome_operator, entity_manager, function_pool, results_manager) :
         self.config = config 
         self.genome_operator = genome_operator
         self.entity_manager = entity_manager 
         self.function_pool = function_pool
+        self.results_manager = results_manager
 
     def process(self, registry) : 
         entity_ids = [id for id in registry.get_all_id_with_fitness() if self.entity_manager.is_alive(id) and registry.has_controller_network(id)]
@@ -36,7 +37,7 @@ class ReproductionSystem :
         ids_of_sorted = np.argsort(fitnesses)
         for taken in range(number_of_elites) : 
             id = ids_of_sorted[len(entity_ids) - 1 - taken]
-            elitism.append(id)
+            elitism.append(entity_ids[id])
 
         for elite in elitism :
             children_entity_ids.append(elite)
@@ -51,7 +52,7 @@ class ReproductionSystem :
                 connections, biases, functions, dominances, nodes  = self.genome_operator.crossover(genome_parent1, genome_parent2)
                 child_id = self.entity_manager.create_entity()
                 children_entity_ids.append(child_id)
-                registry.add_genome(connections[0], connections[1], biases[0], biases[1], functions[0], functions[1], dominances[0], dominances[1], nodes)
+                registry.add_genome(child_id, connections[0], connections[1], biases[0], biases[1], functions[0], functions[1], dominances[0], dominances[1], nodes)
 
             tournament_ids = rd.sample(entity_ids, number_in_tournament)
             fitnesses = np.array([registry.get_fitness(id).fitness for id in tournament_ids])
@@ -59,19 +60,23 @@ class ReproductionSystem :
             taken = 0 
             
             for taken in range(number_of_winner) : 
-                parents_ids.insert(0, ids_of_sorted[number_in_tournament-1-taken])
+                parents_ids.insert(0, tournament_ids[ids_of_sorted[number_in_tournament-1-taken]])
             
-            for child_entity_id in children_entity_ids :
-                genome = registry.get_genome(child_entity_id)
-                new_genome = self.genome_operator.mutate(genome, self.config.sigma_weight, self.config.sigma_bias, self.config.threshold_weight, self.config.threshold_bias, self.config.threshold_function, self.config.threshold_dominance, self.function_pool.pool)
-                
-                if child_entity_id not in elitism :
-                    registry.add_genome(child_entity_id, new_genome.connections[0], new_genome.connections[1], new_genome.biases[0], new_genome.biases[1], new_genome.functions[0], new_genome.functions[1], new_genome.dominances[0], new_genome.dominances[1], new_genome.nodes)                                        
-                else :
-                    registry.modify_genome(child_entity_id, new_genome)
+        for child_entity_id in children_entity_ids :
+            genome = registry.get_genome(child_entity_id)
+            new_genome = self.genome_operator.mutate(genome, self.config.sigma_weight, self.config.sigma_bias, self.config.threshold_weight, self.config.threshold_bias, self.config.threshold_function, self.config.threshold_dominance, self.function_pool.pool)
+            
+            if child_entity_id not in elitism :
+                registry.add_genome(child_entity_id, new_genome.connections[0], new_genome.connections[1], new_genome.biases[0], new_genome.biases[1], new_genome.functions[0], new_genome.functions[1], new_genome.dominances[0], new_genome.dominances[1], new_genome.nodes)                                        
+            else :
+                registry.modify_genome(child_entity_id, new_genome)
 
-        for entity_id in entity_ids :
-            if entity_id not in elitism :
+
+        all_alive_entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
+        for entity_id in all_alive_entity_ids :
+            if entity_id not in children_entity_ids :
                 self.entity_manager.destroy_entity(entity_id)
+            
 
-        # n ajoute le reporter ici aussi      
+        self.results_manager.end_generation()
+    
