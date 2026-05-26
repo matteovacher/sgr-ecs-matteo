@@ -20,7 +20,6 @@ class ReproductionSystem :
 
         # les individus sans corps ne se reproduisent pas / individuals without body cannot reproduce 
 
-        new_pop_counter = 0
         number_of_winner = self.config.number_of_winner
         number_in_tournament = self.config.number_in_tournament 
         max_population = self.config.population 
@@ -41,10 +40,14 @@ class ReproductionSystem :
 
         for elite in elitism :
             children_entity_ids.append(elite)
+            age = registry.get_age(elite).age 
+            birthday = age + 1
+            registry.modify_age(elite, birthday)
 
         while len(children_entity_ids) < max_population : 
             
             if len(parents_ids) >= 2 : 
+                age = 1
                 parent1 = parents_ids.pop()
                 parent2 = parents_ids.pop()
                 genome_parent1 = registry.get_genome(parent1)
@@ -53,6 +56,7 @@ class ReproductionSystem :
                 child_id = self.entity_manager.create_entity()
                 children_entity_ids.append(child_id)
                 registry.add_genome(child_id, connections[0], connections[1], biases[0], biases[1], functions[0], functions[1], dominances[0], dominances[1], nodes)
+                registry.add_age(child_id, age)
 
             tournament_ids = rd.sample(entity_ids, number_in_tournament)
             fitnesses = np.array([registry.get_fitness(id).fitness for id in tournament_ids])
@@ -63,19 +67,20 @@ class ReproductionSystem :
                 parents_ids.insert(0, tournament_ids[ids_of_sorted[number_in_tournament-1-taken]])
             
         for child_entity_id in children_entity_ids :
-            genome = registry.get_genome(child_entity_id)
-            new_genome = self.genome_operator.mutate(genome, self.config.sigma_weight, self.config.sigma_bias, self.config.threshold_weight, self.config.threshold_bias, self.config.threshold_function, self.config.threshold_dominance, self.function_pool.pool)
-            
             if child_entity_id not in elitism :
+                genome = registry.get_genome(child_entity_id)
+                new_genome = self.genome_operator.mutate(genome, self.config.sigma_weight, self.config.sigma_bias, self.config.threshold_weight, self.config.threshold_bias, self.config.threshold_function, self.config.threshold_dominance, self.function_pool.pool)
                 registry.add_genome(child_entity_id, new_genome.connections[0], new_genome.connections[1], new_genome.biases[0], new_genome.biases[1], new_genome.functions[0], new_genome.functions[1], new_genome.dominances[0], new_genome.dominances[1], new_genome.nodes)                                        
-            else :
-                registry.modify_genome(child_entity_id, new_genome)
+            
 
-
+        
         all_alive_entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
         for entity_id in all_alive_entity_ids :
-            if entity_id not in children_entity_ids :
+            if entity_id not in children_entity_ids:
                 self.entity_manager.destroy_entity(entity_id)
+                registry.clear_ind_from_registry(entity_id)
+
+
             
 
         self.results_manager.end_generation()

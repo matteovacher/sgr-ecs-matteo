@@ -38,7 +38,7 @@ class ResultsManager :
         print('\n\n')
     
     def save_results(self, registry, config) :
-        time = time.time()
+        time_1 = time.time()
         if self.save == True : 
             save_config_path = os.path.join(self.abs_path_results, 'json', 'configs.json')
             with open(save_config_path, 'w') as f : 
@@ -50,7 +50,7 @@ class ResultsManager :
                 component_path = os.path.join(self.abs_path_results, 'pkl', '{}.pkl'.format(name))
                 with open(component_path, 'wb') as f : 
                     dill.dump(component_registry, f)
-            passed = time.time() - time
+            passed = time.time() - time_1
             print(f'All results saved successfully in {passed:.3f} s.\n')
 
             print('\n----- Saved Successfully -----\n\n')
@@ -95,12 +95,32 @@ class ResultsManager :
 
     def bests(self, bests) :
         result = '----- Bests of this generation -----\n'
-        result += '\t ID \t fitness \n'
-        result += '\t====\t=========\n'
-        for id, fitness in bests :
-            result += f'\t {id} \t {fitness:.3f}\n'
+        result += '\t ID \t Fitness \t Age\n'
+        result += '\t====\t=========\t=====\n'
+        for id, fitness, age in bests :
+            result += f'\t {id} \t {fitness:.3f} \t\t {age}\n'
         result += '\n'
         self._log(result)
+
+    def average_best(self, bests) :
+        fitnesses = []
+        ids = []
+        best_id = bests[0][0]
+        fitness_best = bests[0][1]
+        for id, fitness, _ in bests :
+            ids.append(id)
+            fitnesses.append(fitness)
+            average = sum(fitnesses) / len(fitnesses)
+            averages = [average for _ in range(len(fitnesses))]
+            diff = [0 for _ in range(len(averages))]
+        for i in range(len(fitnesses)):
+            diff[i] = (fitnesses[i] - averages[i]) ** 2
+        sigma = math.sqrt(sum(diff) / len(diff))
+        result = f'The average of the bests is {average:.3f} with a standard deviation of {sigma:.3f}\n'
+        result += '\n'
+        self._log(result)
+        return best_id, fitness_best, average, sigma
+
        
 
     def average_ind(self, all_ind) :
@@ -110,11 +130,13 @@ class ResultsManager :
         for i in range(len(all_ind)):
             diff[i] = (all_ind[i] - averages[i]) ** 2
         sigma = math.sqrt(sum(diff) / len(diff))
-        result = f'Here is the total average of this generation : {average:.3f}\n'
+        result = f'----- Statistics of this generation -----\n\n'
+        result += f'Here is the total average of this generation : {average:.3f}\n'
         result += 'Please be careful, this fitness depends on how you treat the individual with an invalid body, what fitness is attributed, do you even count these individuals ? Here it should be calculated only with the valid individuals.\n'
         result += f'Anyway the standard deviation of the fitness is {sigma:.3f}\n'
         result += '\n'
         self._log(result)
+        return average, sigma
        
     def deficient(self, number) :
         results = f'The number of deficient individuals on this generation is {number}. IE with an invalid body. '

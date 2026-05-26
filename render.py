@@ -19,19 +19,20 @@ def render() :
     network_manager = NetworkManager(config)
     robot_simulator = RobotSimulator(config)
 
-
+    gen = input("Please indicate the generation of the generation of the individual you want to render : ")
     id = input("Please indicate the ID of the individual you want to render : ")
-    id = int(id)
+    gen, id = int(gen), int(id)
+    key = (gen, id)
 
     video_dir = os.path.join(results_manager.results_dir, 'video')
     os.makedirs(video_dir, exist_ok=True)
 
-    video_mp4_path = os.path.join(video_dir, 'id_{}.mp4'.format(id))
-    video_gif_path = os.path.join(video_dir, 'id_{}.gif'.format(id))
+    video_mp4_path = os.path.join(video_dir, 'gen_{}_id_{}.mp4'.format(gen, id))
+    video_gif_path = os.path.join(video_dir, 'gen_{}_id_{}.gif'.format(gen, id))
 
 
-    body = results_manager.body_registry[id]
-    controller_network = results_manager.controller_network_registry[id]
+    body = results_manager.body_registry[key]
+    controller_network = results_manager.controller_network_registry[key]
     
     images, _ = robot_simulator.simulate_render(body.body, controller_network, network_manager, config.n_steps)
         

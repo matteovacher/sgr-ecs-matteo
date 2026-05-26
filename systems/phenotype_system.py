@@ -23,7 +23,7 @@ class PhenotypeSystem :
         self.results_manager.start_generation(self.generation, self.config)
         self.generation += 1
 
-        entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
+        entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) == False]
         for entity_id in entity_ids : 
             genome = registry.get_genome(entity_id)
             connections, bias, functions = self.genome_operator.dominance(genome)
@@ -41,7 +41,7 @@ class PhenotypeSystem :
 
             body_network = registry.get_body_network(entity_id)
             robot_grid = self.robot_generator.generate_robot_body_from_network(body_network, self.network_manager, self.config.body_shape)
-
+            print(f"robot grid is {robot_grid}")
             if not self.robot_generator.is_valid_robot(robot_grid) :
                 fitness, finished  = -1000, True
                 registry.add_fitness(entity_id, fitness, finished)

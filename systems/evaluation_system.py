@@ -14,11 +14,12 @@ class EvaluationSystem :
         self.parallel_tool = parallel_tool 
         self.entity_manager = entity_manager 
         self.results_manager = results_manager 
+        self.generation = 1
 
 
     def process(self, registry ) :
         
-
+        
         entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id) and registry.has_controller_network(id)]
         controllers = []
         bodies = []
@@ -39,12 +40,14 @@ class EvaluationSystem :
 
         fitnesses = []
         ids = []
+        ages = []
         for entity_id, fitness, finished in results :
             ids.append(entity_id)
             fitnesses.append(fitness)
             registry.add_fitness(entity_id, fitness, finished)
+            ages.append(registry.get_age(entity_id).age)
 
-
+        tosave = True
         fitnesses = np.array(fitnesses)
         arg_sorted_fitnesses = np.argsort(fitnesses)
         bests = []
@@ -52,13 +55,23 @@ class EvaluationSystem :
         number_to_report = min(number_of_reported_individuals, len(entity_ids))
         for taken in range(number_to_report) : 
             id = arg_sorted_fitnesses[len(entity_ids) - 1 - taken]
-            bests.append((ids[id], fitnesses[id]))
+            bests.append((ids[id], fitnesses[id], ages[id]))
+            registry.add_tosave(self.generation, ids[id], tosave) 
+            registry.add_generation(ids[id], self.generation)    
+            registry.snapshot(self.generation, ids[id])       
         
         invalid = self.config.population - len(entity_ids)
 
         self.results_manager.bests(bests)
-        self.results_manager.average_ind(fitnesses)
+        average, sigma =self.results_manager.average_ind(fitnesses)
+        best_id, fitness_best, average_best, sigma_best = self.results_manager.average_best(bests)
         self.results_manager.deficient(invalid)
+
+        generation_id = self.entity_manager.create_entity()
+        registry.add_statistic(generation_id, self.generation, average, sigma, best_id, fitness_best, average_best, sigma_best)
+        
+
+        self.generation += 1
 
         # ici rajouter ensuite les individus qui sont invalide et faire les reports 
 

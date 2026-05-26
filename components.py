@@ -1,5 +1,26 @@
 
 
+class StatisticComponent :
+    def __init__(self, generation, average, std, best, fitness, average_best, std_best) :
+        self.generation = generation
+        self.average = average
+        self.std = std
+        self.best = best
+        self.average_best = average_best
+        self.std_best = std_best
+        self.fitness = fitness
+
+class AgeComponent :
+    def __init__(self, age) :
+        self.age = age
+
+class GenerationComponent :
+    def __init__(self, generation) :
+        self.generation = generation
+
+class TosaveComponent :
+    def __init__(self, tosave) :
+        self.tosave = tosave
 
 class GenomeComponent : 
 

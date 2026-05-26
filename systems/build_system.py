@@ -20,8 +20,7 @@ class BuildSystem :
             entity_id = self.entity_manager.create_entity()
             connections1, connections2, bias1, bias2, activation_functions1, activation_functions2, dominance1, dominance2, nodes_by_layer = self.genome_operator.generate_first_generation_of_genome(nodes_by_layer)
             registry.add_genome(entity_id, connections1, connections2, bias1, bias2, activation_functions1, activation_functions2, dominance1, dominance2, nodes_by_layer)
-
+            registry.add_age(entity_id, 1)
         self.results_manager.starting(self.config)
 
 
-        
