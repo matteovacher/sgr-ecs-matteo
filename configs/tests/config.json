@@ -8,27 +8,27 @@
 
     "sigma_weight" : 0.5, 
     "sigma_bias" : 0.3, 
-    "threshold_weight" : 0.05, 
-    "threshold_bias" : 0.05, 
-    "threshold_function" : 0.025, 
-    "threshold_dominance" : 0.025, 
+    "threshold_weight" : 0.2, 
+    "threshold_bias" : 0.2, 
+    "threshold_function" : 0.3, 
+    "threshold_dominance" : 0.1, 
 
     "number_of_dominances" : 5, 
 
-    "generations" : 80, 
+    "generations" : 20, 
     "population" : 100, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 5, 
-    "number_of_elites" : 3, 
+    "number_in_tournament" : 8, 
+    "number_of_elites" : 5, 
 
     "shape_of_cppn" : [10, 4, 4, 1],
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
     "n_steps" : 500, 
-    "number_of_reported_individuals" : 40,
+    "number_of_reported_individuals" : 20,
 
-    "cpus" : 7, 
+    "cpus" : 6, 
 
     "env_name" : "Walker-v0"
 

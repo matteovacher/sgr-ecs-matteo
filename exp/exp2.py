@@ -50,7 +50,7 @@ def main():
     parallel_tool = ParallelTool(config)
 
 
-    build_system = BuildSystem(config, entity_manager, genome_operator, results_manager)
+    build_system = BuildSystem(config, entity_manager, genome_operator, results_manager, function_pool)
     phenotype_system = PhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager)
     evaluation_system = EvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager)
     reproduction_system = ReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager)

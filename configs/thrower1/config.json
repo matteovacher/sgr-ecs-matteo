@@ -1,0 +1,33 @@
+
+
+{
+    "body_shape" : [5, 5], 
+    "max_weight" : 20, 
+    "max_bias" : 20,
+    "response" : 1, 
+
+    "sigma_weight" : 0.5, 
+    "sigma_bias" : 0.3, 
+    "threshold_weight" : 0.2, 
+    "threshold_bias" : 0.2, 
+    "threshold_function" : 0.3, 
+    "threshold_dominance" : 0.1, 
+
+    "generations" : 10, 
+    "population" : 80, 
+    "number_of_winner" : 1, 
+    "number_in_tournament" :5, 
+    "number_of_elites" : 4, 
+
+    "shape_of_cppn" : [9, 4, 4, 1],
+
+    "function_pool" : ["gaussian", "sin", "abs", "tanh"], 
+
+    "n_steps" : 500, 
+    "number_of_reported_individuals" : 20,
+
+    "cpus" : 7, 
+
+    "env_name" : "Thrower-v0"
+
+}

@@ -6,11 +6,11 @@ class PhenotypeBuilder :
     def __init__(self):
         pass 
 
-    def _query_cppn_weight(self, cppn, network_manager, coordinate1, coordinate2, one_towards_two, max_weight, bias = 1.0) :
+    def _query_cppn_weight(self, cppn, network_manager, coordinate1, coordinate2, one_towards_two, max_weight) :
         if one_towards_two :
-            inputs = [*coordinate1, *coordinate2, bias]
+            inputs = [*coordinate1, *coordinate2]
         else :
-            inputs = [*coordinate2, *coordinate1, bias]
+            inputs = [*coordinate2, *coordinate1]
 
         output = network_manager.activate(cppn, inputs)
 
@@ -24,8 +24,8 @@ class PhenotypeBuilder :
             return 0.0
         
 
-    def _query_cppn_bias(self, cppn, network_manager, coordinate1, max_bias, coordinate2 = [0, 0, 0, 0], bias = 1.0) :
-        inputs = [*coordinate1, *coordinate2, bias]
+    def _query_cppn_bias(self, cppn, network_manager, coordinate1, max_bias, coordinate2 = [0, 0, 0, 0, 0]) :
+        inputs = [*coordinate1, *coordinate2]
         output = network_manager.activate(cppn, inputs)
 
         bias = output 

@@ -20,7 +20,7 @@ class GenomeOperator:
             nodes_by_layer.append(nodes_on_layer)
         return nodes_by_layer
 
-    def generate_first_generation_of_genome(self, nodes_by_layer) :
+    def generate_first_generation_of_genome(self, nodes_by_layer, functions_pool) :
 
         output_activation_function = lambda x : x
 
@@ -33,6 +33,8 @@ class GenomeOperator:
         dominance1 = {}
         dominance2 = {}
 
+        list_of_keys = list(functions_pool.keys())
+
         for index_of_layer in range(len(nodes_by_layer)) :
             if index_of_layer == 0 :
                 previous_layer = nodes_by_layer[index_of_layer]
@@ -43,13 +45,15 @@ class GenomeOperator:
                     weight2 = np.random.uniform(-1, 1)
                     connections1[(previous_node, node)] = weight1
                     connections2[(previous_node, node)] = weight2
-                d1 = np.random.randint(0, 2)
-                d2 = np.random.randint(0, 2)
+                d1 = np.random.randint(0, self.config.number_of_dominances + 1)
+                d2 = np.random.randint(0, self.config.number_of_dominances + 1)
                 b1 = np.random.uniform(-1, 1)
                 b2 = np.random.uniform(-1, 1)
+                c1 = np.random.randint(0, len(list_of_keys)) 
+                c2 = np.random.randint(0, len(list_of_keys))
 
-                act_function1 = np.tanh
-                act_function2 = np.tanh
+                act_function1 = functions_pool[list_of_keys[c1]]
+                act_function2 = functions_pool[list_of_keys[c2]]
                 bias1[node] = b1
                 bias2[node] = b2 
                 activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function 
@@ -61,6 +65,7 @@ class GenomeOperator:
 
 
     def dominance(self, genome) :
+        
         connections = {}
         bias = {}
         functions = {}
@@ -146,7 +151,10 @@ class GenomeOperator:
         for dominances in genome.dominances :
             for node in dominances :
                 if np.random.uniform() < threshold_dominance :
-                    dominances[node] = 0 if dominances[node] == 1 else 1
+                    choice = np.random.randint(0, self.config.number_of_dominances + 1)
+                    while dominances[node] == choice :
+                        choice = np.random.randint(0, self.config.number_of_dominances + 1)
+                    dominances[node] = choice
         
         return genome 
     

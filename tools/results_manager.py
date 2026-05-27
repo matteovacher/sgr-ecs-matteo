@@ -62,6 +62,8 @@ class ResultsManager :
             for system in systems :
                 f.write('\t + {}\n'.format(system))
             f.write('\n\n')
+            comments = input("Please indicate the desired comments : \n")
+            f.write('Comments : {}\n\n'.format(comments))
 
 
     def _log(self, result):
@@ -148,12 +150,15 @@ class ResultsManager :
     def loader(self) : 
         path = input('From which folder do you want to get the results : ')
         number = input('From which experiment ID do you want to get the results : ')
+        self.init_load = True 
         local_dir =os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         results_dir = os.path.join(local_dir, 'results', '{}'.format(path), 'id_{}'.format(number))
         self.results_dir = results_dir
         json_dir  = os.path.join(results_dir, 'json')
         pkl_dir = os.path.join(results_dir, 'pkl')
 
+        print('\n ----- Loading the results ----- \n')
+        print('This will take some time, please wait ... \n\n')
         file = 'configs.json'
         json_dir_file = os.path.join(json_dir, file)
         with open(json_dir_file, 'r') as f : 
@@ -169,6 +174,41 @@ class ResultsManager :
                     file = file.removesuffix('.pkl')
                 loaded_object = dill.load(f)
                 self.__setattr__(file, loaded_object)
+
+        print('\n ----- Results loaded ----- \n')
+        return False 
+    
+    def ask_action(self) :
+        action = input('Do you want the body of the individuals or to render a certain individual ? \n \t [b] / [i] \n \t')
+        return action
+
+    def load_ind(self) :
+        gen = input("Please indicate the generation of the generation of the individual you want to render : ")
+        id = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        if exit == "y" : 
+            return True, gen, id  
+        else :  
+            return False,gen, id
+        
+    def print_bodies(self) :
+        generation = input('Please indicate the generation of the bodies you want to print : ')
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        
+        print('\n ----- Loading the bodies of generation {} ----- \n'.format(generation))
+        keys = [key for key in self.body_registry.keys() if key[0] == int(generation)]
+
+        for key in keys : 
+            print('Here is the body of individual {} : \n'.format(key[1]))
+            print(self.body_registry[key].body)
+            print('')
+    
+        if exit == "y" : 
+            return True 
+        else :  
+            return False
+        
+
 
 
         

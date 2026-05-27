@@ -78,15 +78,40 @@ class SubstrateBuilder:
 
         for layer in shape :
             indice = abs(layer[0]) - 1
+            # if im on body i must have last 2 coordinates acting as a circle and not 1 line, this is why i switched from 4 dimension to 5
+            # to replace the 1 line by a surface so that the cppn identify each possibility of actuators for each voxels identically 
+            # this was not the case before because i had lots of body full of 0 and 4, I think it work for tanaka due to the nature of neat itself, which was protecting 
+            # different individuals, because mine does not do that, those full of 4 individuals take over the population too quickly (gen 1)
+            # simply because of the nature of the subsrate itself i presume 
+
+
             location = first_dim_locations[indice]
             interval_array = []
+            if np.sign(shape[0][0]) == 1  and indice != 0 :
+                for x in layer[1:len(layer)-2] :
+                    interval_one_dimension = np.linspace(-1.0, 1, x) if (x>1) else [0.0]
+                    interval_array.append(interval_one_dimension)
+                if layer[-2] == layer[-1] :
+                    
+                    number_of_points = layer[-1]
+                    angle = 2*np.pi/number_of_points
+                    radius = 1.0/number_of_layer
+                    last_coords = []
+                    for i in range(number_of_points) :
+                        last_coords.append([radius*np.cos(angle*i), radius*np.sin(angle*i)])
+                    
+                    raw_cart_product = list(it.product([location], *interval_array, last_coords))
+                    all_coords = [(*e[:-1], *e[-1]) for e in raw_cart_product]
+                    all_interval.append(all_coords)
 
-            for x in layer[1:] :
-                interval_one_dimension = np.linspace(-1.0, 1, x) if (x>1) else [0.0]
-                interval_array.append(interval_one_dimension)
+            else :
+                for x in layer[1:] :
+                    interval_one_dimension = np.linspace(-1.0, 1, x) if (x>1) else [0.0]
+                    interval_array.append(interval_one_dimension)
 
-            all_coords = list(it.product([location], *interval_array))
-            all_interval.append(all_coords)
+
+                all_coords = list(it.product([location], *interval_array))
+                all_interval.append(all_coords)
         
         return all_interval
 
@@ -95,18 +120,28 @@ class SubstrateBuilder:
 
         body_shape = config.body_shape
         shape_of_substrate = [
-            [1, 1, 1, 1], 
-            [2, body_shape[0], body_shape[1], 2], 
-            [3, body_shape[0], body_shape[1], 5]
+            [1, 1, 1, 1, 1], 
+            [2, body_shape[0], body_shape[1], 5, 5], # the last 2 dim must be the same if you want to implement a circle 
+            [3, body_shape[0], body_shape[1], 5, 5]
+        ]
+        return shape_of_substrate 
+    
+    def extract_body_network_shape_test(self, config):
+
+        body_shape = config.body_shape
+        shape_of_substrate = [
+            [1, 1, 1, 1, 1], 
+            [2, 1, 1, 5, 5], # the last 2 dim must be the same if you want to implement a circle 
+            [3, 2, 2, 5, 5]
         ]
         return shape_of_substrate 
         
     def extract_controller_network_shape(self, grid_input_size, config) :
         body_shape = config.body_shape
         controller_shape = [
-            [-1, grid_input_size, grid_input_size, 1], 
-            [-2, grid_input_size//2, grid_input_size//2, body_shape[0]//2], 
-            [-3, body_shape[0], body_shape[1], 1]
+            [-1, grid_input_size, grid_input_size, 1, 1], 
+            [-2, grid_input_size//2, grid_input_size//2, body_shape[0]//2, body_shape[1]//2], 
+            [-3, body_shape[0], body_shape[1], 1, 1]
         ]
         return controller_shape
 

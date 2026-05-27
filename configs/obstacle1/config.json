@@ -9,15 +9,15 @@
     "sigma_weight" : 0.4, 
     "sigma_bias" : 0.3, 
     "threshold_weight" : 0.2, 
-    "threshold_bias" : 0.15, 
-    "threshold_function" : 0.2, 
+    "threshold_bias" : 0.1, 
+    "threshold_function" : 0.1, 
     "threshold_dominance" : 0.05, 
 
-    "generations" : 2, 
-    "population" : 80, 
+    "generations" : 80, 
+    "population" : 50, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 15, 
-    "number_of_elites" : 5, 
+    "number_in_tournament" : 5, 
+    "number_of_elites" : 3, 
 
     "shape_of_cppn" : [9, 5, 5, 1],
 
@@ -26,7 +26,7 @@
     "n_steps" : 500, 
     "number_of_reported_individuals" : 15,
 
-    "cpus" : 6, 
+    "cpus" : 7, 
 
     "env_name" : "ObstacleTraverser-v1"
 

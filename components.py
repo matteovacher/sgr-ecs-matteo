@@ -16,6 +16,7 @@ class AgeComponent :
 
 class GenerationComponent :
     def __init__(self, generation) :
+        
         self.generation = generation
 
 class TosaveComponent :
