@@ -90,4 +90,12 @@ class RobotSimulator:
         print(f'Individual fitness : {fitness}\n')
         print('----- End of simulation -----\n')
         return images, fitness 
+    
+    def simulate_render_image(self, robot) :
+        env = self._get_env_render(robot)
+        _, _ = env.reset()
+        robot_image = env.render()
+        env.close()
+        del env 
+        return robot_image
         

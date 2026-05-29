@@ -41,7 +41,6 @@ class PhenotypeSystem :
 
             body_network = registry.get_body_network(entity_id)
             robot_grid = self.robot_generator.generate_robot_body_from_network(body_network, self.network_manager, self.config.body_shape)
-            print(f"robot grid is : \n{robot_grid}")
             if not self.robot_generator.is_valid_robot(robot_grid) :
                 fitness, finished  = -1000, True
                 registry.add_fitness(entity_id, fitness, finished)

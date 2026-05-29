@@ -10,6 +10,12 @@ class StatisticComponent :
         self.std_best = std_best
         self.fitness = fitness
 
+class ParentsComponent :
+    def __init__(self, parent1, parent2, choice1, choice2) :
+        self.parents = [parent1, parent2]
+        self.parents_choices = [choice1, choice2]
+        # choice 1 means choice for parent 1 will be 0 or  0 means first chrom and 1 means the 2nd
+
 class AgeComponent :
     def __init__(self, age) :
         self.age = age

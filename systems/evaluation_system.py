@@ -38,6 +38,7 @@ class EvaluationSystem :
         chunk = list(zip(entity_ids, bodies, controllers, n_steps_list, network_manager_list))
         results = self.parallel_tool.run(function, chunk)
 
+        tosave = True
         fitnesses = []
         ids = []
         ages = []
@@ -46,8 +47,11 @@ class EvaluationSystem :
             fitnesses.append(fitness)
             registry.add_fitness(entity_id, fitness, finished)
             ages.append(registry.get_age(entity_id).age)
+            registry.add_tosave(self.generation, entity_id, tosave)
+            registry.snapshot(self.generation, entity_id)
 
-        tosave = True
+
+
         fitnesses = np.array(fitnesses)
         arg_sorted_fitnesses = np.argsort(fitnesses)
         bests = []
@@ -56,9 +60,7 @@ class EvaluationSystem :
         for taken in range(number_to_report) : 
             id = arg_sorted_fitnesses[len(entity_ids) - 1 - taken]
             bests.append((ids[id], fitnesses[id], ages[id]))
-            registry.add_tosave(self.generation, ids[id], tosave) 
-            registry.add_generation(ids[id], self.generation)    
-            registry.snapshot(self.generation, ids[id])       
+                  
         
         invalid = self.config.population - len(entity_ids)
 

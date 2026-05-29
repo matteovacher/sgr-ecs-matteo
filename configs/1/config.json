@@ -15,7 +15,7 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 80, 
+    "generations" : 5, 
     "population" : 100, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 5, 
@@ -28,7 +28,7 @@
     "n_steps" : 500, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 7, 
+    "cpus" : 6, 
 
     "env_name" : "Walker-v0"
 

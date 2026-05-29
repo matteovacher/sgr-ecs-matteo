@@ -42,6 +42,7 @@ class ReproductionSystem :
             children_entity_ids.append(elite)
             age = registry.get_age(elite).age 
             birthday = age + 1
+            registry.add_parents(elite, elite, elite, 0, 0)
             registry.modify_age(elite, birthday)
 
         while len(children_entity_ids) < max_population : 
@@ -52,9 +53,10 @@ class ReproductionSystem :
                 parent2 = parents_ids.pop()
                 genome_parent1 = registry.get_genome(parent1)
                 genome_parent2 = registry.get_genome(parent2)
-                connections, biases, functions, dominances, nodes  = self.genome_operator.crossover(genome_parent1, genome_parent2)
+                connections, biases, functions, dominances, nodes, choice1, choice2  = self.genome_operator.crossover(genome_parent1, genome_parent2)
                 child_id = self.entity_manager.create_entity()
                 children_entity_ids.append(child_id)
+                registry.add_parents(child_id, parent1, parent2, choice1, choice2)
                 registry.add_genome(child_id, connections[0], connections[1], biases[0], biases[1], functions[0], functions[1], dominances[0], dominances[1], nodes)
                 registry.add_age(child_id, age)
 

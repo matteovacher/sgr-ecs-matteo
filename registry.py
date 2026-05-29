@@ -14,6 +14,7 @@ class ComponentRegistry :
         self.generation_registry = {}
         self.age_registry = {}
         self.statistic_registry = {}
+        self.parents_registry = {}
 
     # ADDER METHODS 
     def add_genome(self, entity_id, connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes) :
@@ -49,6 +50,9 @@ class ComponentRegistry :
     def add_statistic(self, entity_id, generation, average, std, best, fitness, average_best, std_best) :
         self.statistic_registry[entity_id] = StatisticComponent(generation, average, std, best, fitness, average_best, std_best)
 
+    def add_parents(self, entity_id, parent1, parent2, choice1, choice2) :
+        self.parents_registry[entity_id] = ParentsComponent(parent1, parent2, choice1, choice2)
+
     # GETTER METHODS 
     def get_genome(self, entity_id) :
         return self.genome_registry[entity_id]
@@ -82,6 +86,9 @@ class ComponentRegistry :
 
     def get_statistic(self, entity_id) :
         return self.statistic_registry[entity_id]
+    
+    def get_parents(self, entity_id) :
+        return self.parents_registry[entity_id]
         
     # ADVANCED GETTER METHODS
     def get_all_id_with_genome(self) :
@@ -120,6 +127,11 @@ class ComponentRegistry :
     def clear_ind_from_registry(self , entity_id) :
         for registry in self.__dict__.values() :
             registry.pop(entity_id, None)
+    
+    def clear_save_from_registry(self, generation, entity_id) :
+        for registry in self.__dict__.values() :
+            registry.pop((generation, entity_id), None)
+
 
     # MODIFYERS please give an object 
     def modify_genome(self, entity_id, other_genome):

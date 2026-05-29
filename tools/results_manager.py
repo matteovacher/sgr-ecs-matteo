@@ -35,25 +35,40 @@ class ResultsManager :
 
         else : 
             self.save = False 
-        print('\n\n')
+        print('\n')
     
     def save_results(self, registry, config) :
-        time_1 = time.time()
+        print('\n----- Saving JSON -----\n')
         if self.save == True : 
             save_config_path = os.path.join(self.abs_path_results, 'json', 'configs.json')
             with open(save_config_path, 'w') as f : 
                 json.dump(config.__dict__, f, indent = 4)
 
-            for name, component_registry in registry.__dict__.items() :
-                if not component_registry :
-                    continue 
-                component_path = os.path.join(self.abs_path_results, 'pkl', '{}.pkl'.format(name))
-                with open(component_path, 'wb') as f : 
-                    dill.dump(component_registry, f)
-            passed = time.time() - time_1
-            print(f'All results saved successfully in {passed:.3f} s.\n')
+            print('\n----- JSON Saved Successfully -----\n\n')
 
-            print('\n----- Saved Successfully -----\n\n')
+            if not registry.statistic_registry :
+                print('\n----- Saving statictic_registry -----\n')
+                component_path = os.path.join(self.abs_path_results, 'pkl', 'statictic_registry.pkl')
+                with open(component_path, 'wb') as f : 
+                    dill.dump(registry.statictic_registry, f)
+                print('\n----- Statictic registry saved successfully -----\n')
+
+
+
+
+    def save_generation_registry(self, component_registry, name, generation  ) :
+        print('\n----- Saving {} of Generation {} -----\n'.format(name, generation))
+        time_1 = time.time()
+        if self.save == True :
+            component_path = os.path.join(self.abs_path_results, 'pkl', '{}_{}.pkl'.format(generation, name))
+            with open(component_path, 'wb') as f : 
+                dill.dump(component_registry, f)
+            print('\n----- {} saved successfully -----\n'.format(name))
+            time_2 = time.time()
+            print('This took {} s.'.format(time_2 - time_1))
+            
+                
+
 
     def begin_txt_file(self, systems) :
         txt_file_dir = os.path.join(self.abs_path_results, 'txt', 'all_info')
@@ -61,8 +76,8 @@ class ResultsManager :
             f.write('\nHere the different systems below are being used :\n')
             for system in systems :
                 f.write('\t + {}\n'.format(system))
-            f.write('\n\n')
-            comments = input("Please indicate the desired comments : \n")
+            f.write('\n')
+            comments = input("Please indicate the desired comments for the text file report : \n")
             f.write('Comments : {}\n\n'.format(comments))
 
 
@@ -81,10 +96,9 @@ class ResultsManager :
         result += '\n'
         self._log(result)
 
-
     def end_generation(self) :
         passed = time.time() - self.time
-        result = f' This Generation took {passed:.3f} s.\n'
+        result = f'\nTHIS GENERATION TOOK {passed:.3f} s.\n'
         result += '\n'
         self._log(result)
        
@@ -135,6 +149,7 @@ class ResultsManager :
         result = f'----- Statistics of this generation -----\n\n'
         result += f'Here is the total average of this generation : {average:.3f}\n'
         result += 'Please be careful, this fitness depends on how you treat the individual with an invalid body, what fitness is attributed, do you even count these individuals ? Here it should be calculated only with the valid individuals.\n'
+        result += 'Here all the valid individuals are considered.\n'
         result += f'Anyway the standard deviation of the fitness is {sigma:.3f}\n'
         result += '\n'
         self._log(result)
@@ -155,10 +170,9 @@ class ResultsManager :
         results_dir = os.path.join(local_dir, 'results', '{}'.format(path), 'id_{}'.format(number))
         self.results_dir = results_dir
         json_dir  = os.path.join(results_dir, 'json')
-        pkl_dir = os.path.join(results_dir, 'pkl')
+        self.pkl_dir = os.path.join(results_dir, 'pkl')
 
-        print('\n ----- Loading the results ----- \n')
-        print('This will take some time, please wait ... \n\n')
+        print('\n ----- Loading the Config ----- \n')
         file = 'configs.json'
         json_dir_file = os.path.join(json_dir, file)
         with open(json_dir_file, 'r') as f : 
@@ -167,40 +181,125 @@ class ResultsManager :
             data_config = json.load(f)
             self.__setattr__(file, data_config)
 
-        for file in os.listdir(pkl_dir) : 
-            file_dir = os.path.join(pkl_dir, file)
-            with open(file_dir, 'rb') as f : 
-                if file.endswith('.pkl') :
-                    file = file.removesuffix('.pkl')
-                loaded_object = dill.load(f)
-                self.__setattr__(file, loaded_object)
-
-        print('\n ----- Results loaded ----- \n')
+        print('\n ----- Config loaded ----- \n')
         return False 
     
     def ask_action(self) :
-        action = input('Do you want the body of the individuals or to render a certain individual ? \n \t [b] / [i] \n \t')
+        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ?\n \t [bodies] / [body] / [render] / [genealogy] / [render genealogy] / [save family] / [save individual] / [anything else to quit] \n \t')
         return action
 
     def load_ind(self) :
         gen = input("Please indicate the generation of the generation of the individual you want to render : ")
         id = input("Please indicate the ID of the individual you want to render : ")
         exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        
+        print('\n ----- Loading the save ----- \n')
+        for file in os.listdir(self.pkl_dir) :
+            if file.startswith('{}'.format(gen)) :
+                file_dir = os.path.join(self.pkl_dir, file)
+                with open(file_dir, 'rb') as f : 
+                    if file.endswith('.pkl') :
+                        file = file.removesuffix('.pkl')
+                    loaded_object = dill.load(f)
+                    self.__setattr__(file, loaded_object)
+        print('\n ----- Save loaded ----- \n')
         if exit == "y" : 
             return True, gen, id  
         else :  
             return False,gen, id
         
+    def save_body(self) :
+        generation = input("Please indicate the generation of the body you want to render : ")
+        ind = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+        print('\n----- Loading the save ----- \n')
+        file = '{}_body_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.pkl_dir, file)
+        with open(file_dir, 'rb') as f :    
+            if file.endswith('.pkl') :  
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+        print('\n----- Save loaded ----- \n')
+        if exit == "y" : 
+            return True, generation, ind  
+        else :  
+            return False, generation, ind
+    
+    def print_body(self) :
+        generation = input('Please indicate the generation of the body you want to print : ')
+        ind = input('Please indicate the ID of the individual you want to print : ')
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+        print('\n ----- Loading the save ----- \n')
+        
+        file = '{}_body_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.pkl_dir, file)
+        with open(file_dir, 'rb') as f :    
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+
+        file = '{}_fitness_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.pkl_dir, file)
+        with open(file_dir, 'rb') as f : 
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+        print('\n ----- Save loaded ----- \n')
+
+        name_body = '{}_body_registry'.format(generation)
+        name_fitness = '{}_fitness_registry'.format(generation)
+
+        body_registry = self.__getattribute__(name_body)
+        fitness_registry = self.__getattribute__(name_fitness)
+        print('Here is the body of the individual {} of generation {} with fitness {} : \n'.format(ind, generation, fitness_registry[(generation, ind)].fitness))
+        print(body_registry[(generation, ind)].body)
+        if exit == "y" : 
+            return True
+        else :  
+            return False
+        
+
+
     def print_bodies(self) :
         generation = input('Please indicate the generation of the bodies you want to print : ')
         exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+
+        print('\n ----- Loading the save ----- \n')
+        
+        file = '{}_body_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.pkl_dir, file)
+        with open(file_dir, 'rb') as f : 
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+
+        file = '{}_fitness_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.pkl_dir, file)
+        with open(file_dir, 'rb') as f : 
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+        print('\n ----- Save loaded ----- \n')
         
         print('\n ----- Loading the bodies of generation {} ----- \n'.format(generation))
-        keys = [key for key in self.body_registry.keys() if key[0] == int(generation)]
+        attr_name = '{}_body_registry'.format(generation)
+        fitness_name = '{}_fitness_registry'.format(generation)
+        body_registry = getattr(self, attr_name)
+        fitness_registry = getattr(self, fitness_name)
+        keys = [key for key in body_registry if key[0] == int(generation)]
 
         for key in keys : 
-            print('Here is the body of individual {} : \n'.format(key[1]))
-            print(self.body_registry[key].body)
+            print('Here is the body of individual {} : with a fitness of {}\n'.format(key[1], fitness_registry[key].fitness))
+            print(body_registry[key].body)
             print('')
     
         if exit == "y" : 
@@ -208,6 +307,200 @@ class ResultsManager :
         else :  
             return False
         
+    def explore_genealogy(self) :
+        generation = input('Please indicate the generation of the individual you want to explore the genealogy : ')
+        id = input('Please indicate the ID of the individual you want to explore : ')
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        generation = int(generation)
+        id = int(id)
+        print('\n ----- Loading the save ----- \n')
+        
+        for i in range(3) :
+            file = '{}_body_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+
+            file = '{}_fitness_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+            
+            file = '{}_genome_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+
+            file = '{}_parents_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+
+        idddd = int(id)
+        genealogy = [[id]]
+        for i in range(3 - 1) :
+            all_parents = []
+            ids_to_get_parent = genealogy[i]
+            name_parents_registry = '{}_parents_registry'.format(generation - i)
+            parents_registry = getattr(self, name_parents_registry)
+            for id in ids_to_get_parent : 
+                parents = parents_registry[(generation - i, id)].parents
+                parent1, parent2 = parents[0], parents[1]
+                all_parents.append(parent1)
+                all_parents.append(parent2)
+            genealogy.append(all_parents)
+
+
+        name_parents_registry = '{}_parents_registry'.format(generation)
+        parents_registry = getattr(self, name_parents_registry)
+        id_of_chromosome_parent1 = parents_registry[(generation, idddd)].parents_choices[0]
+        id_of_chromosome_parent2 = parents_registry[(generation, idddd)].parents_choices[1]
+        parent1 = parents_registry[(generation, idddd)].parents[0]
+        parent2 = parents_registry[(generation, idddd)].parents[1]
+
+        genealogy_choice = []
+        genealogy_choice.append([(parent1, id_of_chromosome_parent1), (parent2, id_of_chromosome_parent2)])
+
+        for i in range(1, 3 - 1) :
+            name_parents_registry = '{}_parents_registry'.format(generation - i)
+            parents_registry = getattr(self, name_parents_registry)
+            to_who_look = genealogy_choice[i - 1]
+            parent1 = parents_registry[(generation - i, to_who_look[0][0])].parents[to_who_look[0][1]]
+            parent2 = parents_registry[(generation - i, to_who_look[1][0])].parents[to_who_look[1][1]]
+            id_of_chromosome_parent1 = parents_registry[(generation - i, to_who_look[0][0])].parents_choices[to_who_look[0][1]]
+            id_of_chromosome_parent2 = parents_registry[(generation - i, to_who_look[1][0])].parents_choices[to_who_look[1][1]]
+            genealogy_choice.append([(parent1, id_of_chromosome_parent1), (parent2, id_of_chromosome_parent2)])
+
+          
+        print('I will try to print the genealogy so that it is readable')
+        for i in range(len(genealogy)) :
+        
+            print('\n ----- Generation {} ----- \n'.format(generation - 2 + i))
+            for id in genealogy[2 - i] :
+                if i == 0 :
+                    name_body = '{}_body_registry'.format(generation - 2 + i)
+                    name_fitness = '{}_fitness_registry'.format(generation - 2 + i)
+                    name_genome = '{}_genome_registry'.format(generation - 2 + i)
+                    body_registry = getattr(self, name_body)
+                    fitness_registry = getattr(self, name_fitness)
+                    genome_registry = getattr(self, name_genome)
+                    print('ID : {}'.format(id))
+                    print('The fitness of this individual is : {}'.format(fitness_registry[(generation - 2 + i, id)].fitness))
+                    print('The body of this individual is : \n{}'.format(body_registry[(generation - 2 + i, id)].body))
+                    print('The Dominances of this individual is : \n{}\n{}'.format(genome_registry[(generation - 2 + i, id)].dominances[0], genome_registry[(generation - 2 + i, id)].dominances[1]))
+                    print('')
+                else :
+                    name_parents = '{}_parents_registry'.format(generation - 2 + i)
+                    name_body = '{}_body_registry'.format(generation - 2 + i)
+                    name_fitness = '{}_fitness_registry'.format(generation - 2 + i)
+                    name_genome = '{}_genome_registry'.format(generation - 2 + i)
+                    parents_registry = getattr(self, name_parents)
+                    body_registry = getattr(self, name_body)
+                    fitness_registry = getattr(self, name_fitness)
+                    genome_registry = getattr(self, name_genome)
+                    print('ID : {}'.format(id))
+                    print('The parents of this individual are : {} and {}'.format(parents_registry[(generation - 2 + i, id)].parents[0], parents_registry[(generation - 2 + i, id)].parents[1]))
+                    print('The fitness of this individual is : {}'.format(fitness_registry[(generation - 2 + i, id)].fitness))
+                    print('The body of this individual is : \n{}'.format(body_registry[(generation - 2 + i, id)].body))
+                    print('The Dominances of this individual is : \n{}\n{}'.format(genome_registry[(generation - 2 + i, id)].dominances[0], genome_registry[(generation - 2 + i, id)].dominances[1]))
+                    print('')
+            
+        print('Now let s study the genes and from which individual they are inherited, since we do not mix genomes like the meiosis it is simpler to analyze : \n')
+        print('The first chromosome comes from the individual {} who is his grand parent.'.format(parent1))
+        print('The second chromosome comes from the individual {} who is his grand parent.\n\n'.format(parent2))
+
+        if exit == "y" : 
+            return True  
+        else :  
+            return False
+        
+    def render_family(self) :
+        generation = input("Please indicate the generations of the family you want to render : ")
+        ind = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+
+        print('\n ----- Loading the save ----- \n')
+        for i in range(3) :
+            for file in os.listdir(self.pkl_dir) :
+                if file.startswith('{}'.format(generation - i)) :
+                    file_dir = os.path.join(self.pkl_dir, file)
+                    with open(file_dir, 'rb') as f : 
+                        if file.endswith('.pkl') :
+                            file = file.removesuffix('.pkl')
+                        loaded_object = dill.load(f)
+                        self.__setattr__(file, loaded_object)
+        
+        genealogy = [[ind]]
+        for i in range(3 - 1) :
+            all_parents = []
+            ids_to_get_parent = genealogy[i]
+            name_parents_registry = '{}_parents_registry'.format(generation - i)
+            parents_registry = getattr(self, name_parents_registry)
+            for id in ids_to_get_parent : 
+                parents = parents_registry[(generation - i, id)].parents
+                parent1, parent2 = parents[0], parents[1]
+                all_parents.append(parent1)
+                all_parents.append(parent2)
+            genealogy.append(all_parents)
+
+        if exit == "y" :
+            return True, generation, ind, genealogy
+        else : 
+            return False, generation, ind, genealogy
+        
+    def save_family(self) :
+        generation = input("Please indicate the generations of the family you want to render : ")
+        ind = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+
+        print('\n ----- Loading the save ----- \n')
+        for i in range(3) :
+            for file in os.listdir(self.pkl_dir) :
+                if file.startswith('{}'.format(generation - i)) :
+                    file_dir = os.path.join(self.pkl_dir, file)
+                    with open(file_dir, 'rb') as f : 
+                        if file.endswith('.pkl') :
+                            file = file.removesuffix('.pkl')
+                        loaded_object = dill.load(f)
+                        self.__setattr__(file, loaded_object)
+        
+        genealogy = [[ind]]
+        for i in range(3 - 1) :
+            all_parents = []
+            ids_to_get_parent = genealogy[i]
+            name_parents_registry = '{}_parents_registry'.format(generation - i)
+            parents_registry = getattr(self, name_parents_registry)
+            for id in ids_to_get_parent : 
+                parents = parents_registry[(generation - i, id)].parents
+                parent1, parent2 = parents[0], parents[1]
+                all_parents.append(parent1)
+                all_parents.append(parent2)
+            genealogy.append(all_parents)
+
+        if exit == "y" :
+            return True, generation, ind, genealogy
+        else : 
+            return False, generation, ind, genealogy
+
+
+        
+
 
 
 

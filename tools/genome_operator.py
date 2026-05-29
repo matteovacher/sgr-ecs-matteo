@@ -123,7 +123,7 @@ class GenomeOperator:
         dominances.append(dominances_parent1)
         dominances.append(dominances_parent2)
 
-        return connections, bias, functions, dominances, genome1.nodes
+        return connections, bias, functions, dominances, genome1.nodes, choice1, choice2
 
 
 
@@ -132,10 +132,12 @@ class GenomeOperator:
             for connection in connections :
                 if np.random.uniform() < threshold_weight :
                     connections[connection] += np.random.normal(loc = 0, scale = sigma_weight)
+                    # print('happened w')
         for biases in genome.biases :
             for node in biases :
                 if np.random.uniform() < threshold_bias :
                     biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
+                    # print('happened b')
         list_of_keys = list(functions_pool.keys())
         for functions in genome.functions :
             for node in functions :
@@ -148,6 +150,7 @@ class GenomeOperator:
                         choice = np.random.randint(0, len(list_of_keys)) 
                         new_function = functions_pool[list_of_keys[choice]]
                     functions[node] = new_function
+                    # print('happened f')
         for dominances in genome.dominances :
             for node in dominances :
                 if np.random.uniform() < threshold_dominance :
@@ -155,6 +158,7 @@ class GenomeOperator:
                     while dominances[node] == choice :
                         choice = np.random.randint(0, self.config.number_of_dominances + 1)
                     dominances[node] = choice
+                    # print('happened d')
         
         return genome 
     
