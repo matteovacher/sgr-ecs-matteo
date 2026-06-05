@@ -15,7 +15,7 @@ class SaveGenSystem :
             if not component_registry :
                 continue
             dict = {}
-            if name == 'genome_registry' or name == 'fitness_registry' or name == 'controller_network_registry' or name == 'body_registry' or name == 'tosave_registry' or name == 'generation_registry' or name == 'age_registry' or name == 'parents_registry' :
+            if name == 'genome_registry' or name == 'fitness_registry' or name == 'controller_network_registry' or name == 'body_registry' or name == 'tosave_registry' or name == 'generation_registry' or name == 'age_registry' or name == 'parents_registry' or name == 'cppn_registry' :
                 for key_ind in keys_ind :
                     dict[key_ind] = component_registry[key_ind]
                 self.results_manager.save_generation_registry(dict, name, self.generation)

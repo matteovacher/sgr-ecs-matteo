@@ -7,6 +7,7 @@ class SaveSystem :
         
 
     def process(self, registry ) :
+
         self.results_manager.save_results(registry, self.config)
 
         

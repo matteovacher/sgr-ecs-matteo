@@ -46,12 +46,11 @@ class ResultsManager :
 
             print('\n----- JSON Saved Successfully -----\n\n')
 
-            if not registry.statistic_registry :
-                print('\n----- Saving statictic_registry -----\n')
-                component_path = os.path.join(self.abs_path_results, 'pkl', 'statictic_registry.pkl')
-                with open(component_path, 'wb') as f : 
-                    dill.dump(registry.statictic_registry, f)
-                print('\n----- Statictic registry saved successfully -----\n')
+            print('\n----- Saving statistic_registry -----\n')
+            component_path = os.path.join(self.abs_path_results, 'pkl', 'statistic_registry.pkl')
+            with open(component_path, 'wb') as f : 
+                dill.dump(registry.statistic_registry, f)
+            print('\n----- Statistic registry saved successfully -----\n')
 
 
 
@@ -185,7 +184,7 @@ class ResultsManager :
         return False 
     
     def ask_action(self) :
-        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ?\n \t [bodies] / [body] / [render] / [genealogy] / [render genealogy] / [save family] / [save individual] / [anything else to quit] \n \t')
+        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [genealogy] / [render genealogy] / [save family] / [save individual] / [distance] / [anything else to quit] \n \t')
         return action
 
     def load_ind(self) :
@@ -497,7 +496,75 @@ class ResultsManager :
             return True, generation, ind, genealogy
         else : 
             return False, generation, ind, genealogy
+        
+    def print_distance(self, distance_tool) :
+        generation1 = input('Please indicate the generation of the first individual : ')
+        id1 = input('Please indicate the ID of the first individual : ')
+        generation2 = input('Please indicate the generation of the second individual : ')
+        id2 = input('Please indicate the ID of the second individual : ')
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        generation1, id1, generation2, id2 = int(generation1), int(id1), int(generation2), int(id2)
 
+        print('\n ----- Loading the save ----- \n')
+        file1 = '{}_body_registry.pkl'.format(generation1)
+        file_dir = os.path.join(self.pkl_dir, file1)
+        with open (file_dir, 'rb') as f :    
+            if file1.endswith('.pkl') :  
+                file1 = file1.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file1, loaded_object)
+
+        file2 = '{}_body_registry.pkl'.format(generation2)    
+        file_dir = os.path.join(self.pkl_dir, file2)
+        with open (file_dir, 'rb') as f :    
+            if file2.endswith('.pkl') :  
+                file2 = file2.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file2, loaded_object)
+        
+        name_body1 = '{}_body_registry'.format(generation1)
+        name_body2 = '{}_body_registry'.format(generation2)
+        body_registry1 = getattr(self, name_body1)
+        body_registry2 = getattr(self, name_body2)
+        body1 = body_registry1[(generation1, id1)].body
+        body2 = body_registry2[(generation2, id2)].body
+
+        file1 = '{}_cppn_registry.pkl'.format(generation1)
+        file_dir = os.path.join(self.pkl_dir, file1)
+        with open (file_dir, 'rb') as f :    
+            if file1.endswith('.pkl') :  
+                file1 = file1.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file1, loaded_object)
+
+        file2 = '{}_cppn_registry.pkl'.format(generation2)
+        file_dir = os.path.join(self.pkl_dir, file2)
+        with open (file_dir, 'rb') as f :
+            if file2.endswith('.pkl') :  
+                file2 = file2.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file2, loaded_object)
+
+        name_cppn1 = '{}_cppn_registry'.format(generation1)
+        name_cppn2 = '{}_cppn_registry'.format(generation2)
+        cppn_registry1 = getattr(self, name_cppn1)
+        cppn_registry2 = getattr(self, name_cppn2)
+        node_evals1 = cppn_registry1[(generation1, id1)].node_evals
+        node_evals2 = cppn_registry2[(generation2, id2)].node_evals
+
+        act_function_distance, weight_distance, bias_distance = distance_tool.distance_expressed_genome(node_evals1, node_evals2)
+        distance, distance_normalized = distance_tool.phenotypic_body_distance(body1, body2)
+        print('\n ----- Save loaded ----- \n')
+        print('The body of the individual {} of generation {} is : \n{} \nAnd the body of the individual {} of generation {} is : \n{} \n'.format(id1, generation1, body1, id2, generation2, body2))
+        print('The phenotypic body distance between the individual {} of generation {} and the individual {} of generation {} is : \n{} \nAnd the normalized distance is : \n{} \nAnd the compatibility is : \n{}% \n'.format(id1, generation1, id2, generation2, distance, distance_normalized, 100 * (1 - distance_normalized)))
+        print('The distance between the activation functions of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, act_function_distance))
+        print('The distance between the weights of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, weight_distance))
+        print('The distance between the biases of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, bias_distance))
+        
+        if exit == "y" :
+            return True
+        else : 
+            return False
 
         
 

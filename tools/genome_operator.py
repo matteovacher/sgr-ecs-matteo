@@ -41,14 +41,14 @@ class GenomeOperator:
                 continue 
             for node in nodes_by_layer[index_of_layer] :
                 for previous_node in previous_layer :
-                    weight1 = np.random.uniform(-1, 1)
-                    weight2 = np.random.uniform(-1, 1)
+                    weight1 = self.config.range_weight * np.random.uniform(-1, 1)
+                    weight2 = self.config.range_weight * np.random.uniform(-1, 1)
                     connections1[(previous_node, node)] = weight1
                     connections2[(previous_node, node)] = weight2
                 d1 = np.random.randint(0, self.config.number_of_dominances + 1)
                 d2 = np.random.randint(0, self.config.number_of_dominances + 1)
-                b1 = np.random.uniform(-1, 1)
-                b2 = np.random.uniform(-1, 1)
+                b1 = self.config.range_bias * np.random.uniform(-1, 1)
+                b2 = self.config.range_bias * np.random.uniform(-1, 1)
                 c1 = np.random.randint(0, len(list_of_keys)) 
                 c2 = np.random.randint(0, len(list_of_keys))
 

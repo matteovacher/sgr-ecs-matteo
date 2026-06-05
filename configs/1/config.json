@@ -6,26 +6,28 @@
     "max_bias" : 20,
     "response" : 1, 
 
+    "range_weight" : 12, 
+    "range_bias" : 12,
     "sigma_weight" : 0.5, 
     "sigma_bias" : 0.3, 
     "threshold_weight" : 0.05, 
     "threshold_bias" : 0.05, 
-    "threshold_function" : 0.025, 
-    "threshold_dominance" : 0.025, 
+    "threshold_function" : 0.05,
+    "threshold_dominance" : 0.1, 
 
     "number_of_dominances" : 5, 
 
-    "generations" : 5, 
+    "generations" : 40, 
     "population" : 100, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 5, 
-    "number_of_elites" : 3, 
+    "number_of_elites" : 2, 
 
-    "shape_of_cppn" : [10, 4, 4, 1],
+    "shape_of_cppn" : [10, 4, 4, 2, 1],
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : 500, 
+    "n_steps" : 800, 
     "number_of_reported_individuals" : 40,
 
     "cpus" : 6, 
