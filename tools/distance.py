@@ -53,19 +53,37 @@ class DistanceTool :
         weight_distance = 0 
         bias_distance = 0
 
+        count_weight = 0 
+        count_bias = 0 
+        weight_distance = 0
+
+
         for node_eval1, node_eval2 in zip(node_evals1, node_evals2) :
             node1, activation_function1, agregation_function1, bias1, response1, inputs_of_node1 = node_eval1
             node2, activation_function2, agregation_function2, bias2, response2, inputs_of_node2 = node_eval2
             list_of_weight1 = [weight for previous_node, weight in inputs_of_node1]
             list_of_weight2 = [weight for previous_node, weight in inputs_of_node2]
-            bias1 = [bias1]
-            bias2 = [bias2]
-            weight_distance += np.linalg.norm(np.array(list_of_weight1) - np.array(list_of_weight2))
+            
+            for weight1, weight2 in zip(list_of_weight1, list_of_weight2) :
+                weight_distance += np.linalg.norm(np.array(weight1) - np.array(weight2))
+
+            count_weight += len(list_of_weight1)
+            count_bias += 1
+
             bias_distance += np.linalg.norm(np.array(bias1) - np.array(bias2))
             act_functions_distance += 0 if activation_function1 is activation_function2 else 1
 
+
+        number_of_nodes = sum(self.config.shape_of_cppn[1:])
+
+        normnalized_act_functions_distance = act_functions_distance / number_of_nodes
+        normalized_weight_distance = weight_distance / (count_weight * 2 * self.config.range_weight)
+        normalized_bias_distance = bias_distance / (count_bias * 2 * self.config.range_bias)
+
+        
+
     
-        return act_functions_distance, weight_distance, bias_distance
+        return act_functions_distance, weight_distance, bias_distance, normnalized_act_functions_distance, normalized_weight_distance, normalized_bias_distance
 
 
             

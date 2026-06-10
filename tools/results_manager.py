@@ -552,7 +552,7 @@ class ResultsManager :
         node_evals1 = cppn_registry1[(generation1, id1)].node_evals
         node_evals2 = cppn_registry2[(generation2, id2)].node_evals
 
-        act_function_distance, weight_distance, bias_distance = distance_tool.distance_expressed_genome(node_evals1, node_evals2)
+        act_function_distance, weight_distance, bias_distance, normalized_act_function_distance, normalized_weight_distance, normalized_bias_distance = distance_tool.distance_expressed_genome(node_evals1, node_evals2)
         distance, distance_normalized = distance_tool.phenotypic_body_distance(body1, body2)
         print('\n ----- Save loaded ----- \n')
         print('The body of the individual {} of generation {} is : \n{} \nAnd the body of the individual {} of generation {} is : \n{} \n'.format(id1, generation1, body1, id2, generation2, body2))
@@ -560,7 +560,12 @@ class ResultsManager :
         print('The distance between the activation functions of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, act_function_distance))
         print('The distance between the weights of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, weight_distance))
         print('The distance between the biases of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, bias_distance))
+        print('The normalized distance between the activation functions of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, normalized_act_function_distance))
+        print('The normalized distance between the weights of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, normalized_weight_distance))
+        print('The normalized distance between the biases of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, normalized_bias_distance))
+        print('\nPlease note that here, a normalized distance of 1 means that twice the parameter_range is between the two considered genome. For example for a weight range of 5, a normalized distance of 1 means that the two genome are separated by a distance of 20')
         
+
         if exit == "y" :
             return True
         else : 

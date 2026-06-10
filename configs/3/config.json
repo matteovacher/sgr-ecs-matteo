@@ -1,15 +1,16 @@
 
 
+
 {
     "body_shape" : [5, 5], 
     "max_weight" : 20, 
     "max_bias" : 20,
     "response" : 1, 
 
-    "range_weight" : 12, 
-    "range_bias" : 12,
+    "range_weight" : 11, 
+    "range_bias" : 11,
     "sigma_weight" : 0.5, 
-    "sigma_bias" : 0.3, 
+    "sigma_bias" : 0.5, 
     "threshold_weight" : 0.1, 
     "threshold_bias" : 0.1, 
     "threshold_function" : 0.05,
@@ -17,7 +18,7 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 100, 
+    "generations" : 30, 
     "population" : 100, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 5, 
@@ -30,9 +31,9 @@
     "n_steps" : 800, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 7, 
+    "cpus" : 6, 
 
-    "env_name" : "Walker-v0"
+    "env_name" : "BridgeWalker-v0"
 
 }
 

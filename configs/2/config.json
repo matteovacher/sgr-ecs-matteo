@@ -6,10 +6,10 @@
     "max_bias" : 20,
     "response" : 1, 
 
-    "range_weight" : 12, 
-    "range_bias" : 12,
+    "range_weight" : 15, 
+    "range_bias" : 15,
     "sigma_weight" : 0.5, 
-    "sigma_bias" : 0.3, 
+    "sigma_bias" : 0.5, 
     "threshold_weight" : 0.1, 
     "threshold_bias" : 0.1, 
     "threshold_function" : 0.05,
@@ -27,13 +27,11 @@
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : 800, 
+    "n_steps" : 1000, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 7, 
+    "cpus" : 8, 
 
-    "env_name" : "Walker-v0"
+    "env_name" : "Climber-v0"
 
 }
-
-
