@@ -22,7 +22,6 @@ class AgeComponent :
 
 class GenerationComponent :
     def __init__(self, generation) :
-        
         self.generation = generation
 
 class TosaveComponent :
@@ -37,6 +36,15 @@ class GenomeComponent :
         self.functions = [function1, function2]
         self.dominances =[dominance1, dominance2]
         self.nodes = nodes 
+
+class HaploidComponent :
+    def __init__(self, connections, biases, functions, dominances, nodes) :
+        self.connections = connections 
+        self.biases = biases 
+        self.functions = functions 
+        self.dominances = dominances 
+        self.nodes = nodes 
+
 
 class Chromosome2Component:
     

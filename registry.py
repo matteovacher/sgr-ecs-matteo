@@ -15,10 +15,14 @@ class ComponentRegistry :
         self.age_registry = {}
         self.statistic_registry = {}
         self.parents_registry = {}
+        self.haploid_registry = {}
 
     # ADDER METHODS 
     def add_genome(self, entity_id, connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes) :
         self.genome_registry[entity_id] = GenomeComponent(connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes)
+        
+    def add_haploid(self, entity_id, connections, biases, functions, dominances, nodes) : 
+        self.haploid_registry[entity_id] = HaploidComponent(connections, biases, functions, dominances, nodes)
 
     def add_chromosome2(self, entity_id, sex1, sex2):
         self.chromosome2_registry[entity_id] = Chromosome2Component(sex1, sex2)      
@@ -56,6 +60,9 @@ class ComponentRegistry :
     # GETTER METHODS 
     def get_genome(self, entity_id) :
         return self.genome_registry[entity_id]
+    
+    def get_haploid(self, entity_id) :
+        return self.haploid_registry[entity_id]
 
     def get_chromosome2(self, entity_id):
         return self.chromosome2_registry[entity_id]
@@ -93,7 +100,10 @@ class ComponentRegistry :
     # ADVANCED GETTER METHODS
     def get_all_id_with_genome(self) :
         return self.genome_registry.keys()
-    
+
+    def get_all_id_with_haploid(self) :
+        return self.haploid_registry.keys()
+
     def get_all_id_with_chromosome2(self):
         return self.chromosome2_registry.keys()
     
@@ -136,6 +146,9 @@ class ComponentRegistry :
     # MODIFYERS please give an object 
     def modify_genome(self, entity_id, other_genome):
         self.genome_registry[entity_id] = other_genome
+
+    def modify_haploid(self, entity_id, other_haploid) :
+        self.haploid_registry[entity_id] = other_haploid 
 
     def modify_age(self, entity_id, age) :
         self.age_registry[entity_id] = AgeComponent(age)

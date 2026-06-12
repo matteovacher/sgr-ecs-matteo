@@ -163,6 +163,90 @@ class GenomeOperator:
         return genome 
     
 
+class HaploidOperator : 
+
+    def __init__(self, config) :
+        self.config = config 
+
+    def nodes_by_layer(self, shape_of_cppn) : 
+        node = 0 
+        nodes_by_layer = []
+        for index_of_layer in range(len(shape_of_cppn)) :
+            nodes_on_layer = []
+            for _ in range (shape_of_cppn(index_of_layer)) :
+                nodes_on_layer.append(node)
+                node += 1
+            nodes_by_layer.append(nodes_on_layer)
+        return nodes_by_layer
+    
+    def generate_first_generation_of_genome(self, nodes_by_layer, functions_pool) :
+
+        output_activation_function = lambda x : x
+
+        connections = {}
+        biases = {}
+        activation_functions = {}
+        dominances = {}
+
+
+        list_of_keys = list(functions_pool.keys())
+
+        for index_of_layer in range(len(nodes_by_layer)) :
+            if index_of_layer == 0 :
+                previous_layer = nodes_by_layer[index_of_layer]
+                continue 
+            for node in nodes_by_layer[index_of_layer] :
+                for previous_node in previous_layer :
+                    weight = self.config.range_weight * np.random.uniform(-1, 1)
+                    connections[(previous_node, node)] = weight
+                d = np.random.randint(0, self.config.number_of_dominances + 1)
+                b = self.config.range_bias * np.random.uniform(-1, 1)
+                c = np.random.randint(0, len(list_of_keys)) 
+                act_function = functions_pool[list_of_keys[c]]
+                biases[node] = b
+                activation_functions[node] = act_function if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function 
+                dominances[node] = d
+            previous_layer = nodes_by_layer[index_of_layer]
+        return connections, biases, activation_functions, dominances, nodes_by_layer
+
+    def crossover(self, haploid, other_haploid) :
+        
+        connections = {}
+        biases = {}
+        functions = {}
+
+        for index_of_layer in range(len(haploid.nodes)) :
+            if index_of_layer == 0 :
+                previous_layer = haploid.nodes[index_of_layer]
+                continue 
+
+            for node in haploid.nodes[index_of_layer] :
+                for previous_node in previous_layer :
+                    if haploid.dominances[node] > other_haploid.dominances[node] :
+                        connections[(previous_node, node)] = copy.deepcopy(haploid.connection[(previous_node, node)])
+                        biases[node] = copy.deepcopy(haploid.biases[node])
+                        functions[node] = copy.deepcopy(haploid.functions[node])
+                    elif haploid.dominances[node] < other_haploid.dominances[node] :
+                        connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
+                        biases[node] = copy.deepcopy(other_haploid.biases[node])
+                        functions[node] = copy.deepcopy(other_haploid.functions[node])
+                    else :
+                        choice = np.random.randint(0, 2)
+                        if choice == 0 : 
+                            connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
+                            biases[node] = copy.deepcopy(haploid.biases[node])
+                            functions[node] = copy.deepcopy(haploid.functions[node])
+                        else : 
+                            connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
+                            biases[node] = copy.deepcopy(other_haploid.biases[node])
+                            functions[node] = copy.deepcopy(other_haploid.functions[node])                            
+
+
+            previous_layer = haploid.nodes[index_of_layer]
+
+        return connections, biases, functions
+
+
 
 
         
@@ -173,9 +257,3 @@ class GenomeOperator:
                 
 
 
-
-
-
-
-    
-        
