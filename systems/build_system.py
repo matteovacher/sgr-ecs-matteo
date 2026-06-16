@@ -24,4 +24,25 @@ class BuildSystem :
             registry.add_age(entity_id, 1)
         self.results_manager.starting(self.config)
 
+class BuildHaploidSystem() :
+    
+    def __str__(self) :
+        return "BuildHaploidSystem"
+    
+    def __init__(self, config, entity_manager, genome_operator, results_manager, function_pool) :
+        self.config = config
+        self.entity_manager = entity_manager
+        self.genome_operator = genome_operator
+        self.results_manager = results_manager
+        self.function_pool = function_pool
+
+    def process(self, registry) :
+        nodes_by_layer = self.genome_operator.nodes_by_layer(self.config.shape_of_cppn)
+
+        for _ in range(self.config.population) :
+            entity_id = self.entity_manager.create_entity()
+            connections, biases, activation_functions, dominances, nodes_by_layer = self.genome_operator.generate_first_generation_of_genome(nodes_by_layer, self.function_pool.pool) 
+            registry.add_haploid(entity_id, connections, biases, activation_functions, dominances, nodes_by_layer)
+            registry.add_age(entity_id, 1)
+        self.results_manager.starting(self.config)
 

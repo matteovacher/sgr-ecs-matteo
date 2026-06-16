@@ -76,25 +76,28 @@ class GenomeOperator:
                 continue 
 
             for node in genome.nodes[index_of_layer] :
-                for previous_node in previous_layer :
-                    if genome.dominances[0][node] > genome.dominances[1][node] :
+                    
+                if genome.dominances[0][node] > genome.dominances[1][node] :
+                    bias[node] = genome.biases[0][node]
+                    functions[node] = genome.functions[0][node]
+                    for previous_node in previous_layer :
                         connections[(previous_node, node)] = genome.connections[0][(previous_node, node)]
-                        bias[node] = genome.biases[0][node]
-                        functions[node] = genome.functions[0][node]
-                    elif genome.dominances[0][node] < genome.dominances[1][node] :
+                elif genome.dominances[0][node] < genome.dominances[1][node] :
+                    bias[node] = genome.biases[1][node]
+                    functions[node] = genome.functions[1][node]
+                    for previous_node in previous_layer :
                         connections[(previous_node, node)] = genome.connections[1][(previous_node, node)]
-                        bias[node] = genome.biases[1][node]
-                        functions[node] = genome.functions[1][node]
-                    else :
-                        choice = np.random.randint(0, 2)
+                else :
+                    choice = np.random.randint(0, 2)
+                    bias[node] = genome.biases[choice][node]
+                    functions[node] = genome.functions[choice][node]
+                    for previous_node in previous_layer :
                         connections[(previous_node, node)] = genome.connections[choice][(previous_node, node)]
-                        bias[node] = genome.biases[choice][node]
-                        functions[node] = genome.functions[choice][node]
 
             previous_layer = genome.nodes[index_of_layer]
 
         return connections, bias, functions
-
+    
     def crossover(self, genome1, genome2) :
 
         connections =[]
@@ -123,7 +126,9 @@ class GenomeOperator:
         dominances.append(dominances_parent1)
         dominances.append(dominances_parent2)
 
-        return connections, bias, functions, dominances, genome1.nodes, choice1, choice2
+        nodes = copy.deepcopy(genome1.nodes)
+
+        return connections, bias, functions, dominances, nodes, choice1, choice2
 
 
 
@@ -173,7 +178,7 @@ class HaploidOperator :
         nodes_by_layer = []
         for index_of_layer in range(len(shape_of_cppn)) :
             nodes_on_layer = []
-            for _ in range (shape_of_cppn(index_of_layer)) :
+            for _ in range (shape_of_cppn[index_of_layer]) :
                 nodes_on_layer.append(node)
                 node += 1
             nodes_by_layer.append(nodes_on_layer)
@@ -214,6 +219,7 @@ class HaploidOperator :
         connections = {}
         biases = {}
         functions = {}
+        dominances = {}
 
         for index_of_layer in range(len(haploid.nodes)) :
             if index_of_layer == 0 :
@@ -221,32 +227,71 @@ class HaploidOperator :
                 continue 
 
             for node in haploid.nodes[index_of_layer] :
-                for previous_node in previous_layer :
-                    if haploid.dominances[node] > other_haploid.dominances[node] :
-                        connections[(previous_node, node)] = copy.deepcopy(haploid.connection[(previous_node, node)])
-                        biases[node] = copy.deepcopy(haploid.biases[node])
-                        functions[node] = copy.deepcopy(haploid.functions[node])
-                    elif haploid.dominances[node] < other_haploid.dominances[node] :
-                        connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
-                        biases[node] = copy.deepcopy(other_haploid.biases[node])
-                        functions[node] = copy.deepcopy(other_haploid.functions[node])
-                    else :
-                        choice = np.random.randint(0, 2)
-                        if choice == 0 : 
-                            connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
-                            biases[node] = copy.deepcopy(haploid.biases[node])
-                            functions[node] = copy.deepcopy(haploid.functions[node])
-                        else : 
-                            connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
-                            biases[node] = copy.deepcopy(other_haploid.biases[node])
-                            functions[node] = copy.deepcopy(other_haploid.functions[node])                            
 
+                if haploid.dominances[node] > other_haploid.dominances[node] :
+                    biases[node] = copy.deepcopy(haploid.biases[node])
+                    functions[node] = copy.deepcopy(haploid.functions[node])
+                    dominances[node] = copy.deepcopy(haploid.dominances[node])
+                    for previous_node in previous_layer :
+                        connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
+                elif haploid.dominances[node] < other_haploid.dominances[node] :
+                    biases[node] = copy.deepcopy(other_haploid.biases[node])
+                    functions[node] = copy.deepcopy(other_haploid.functions[node])  
+                    dominances[node] = copy.deepcopy(other_haploid.dominances[node])
+                    for previous_node in previous_layer :
+                        connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
+                else :
+                    choice = np.random.randint(0, 2)
+                    if choice == 0 : 
+                        biases[node] = copy.deepcopy(haploid.biases[node])
+                        functions[node] = copy.deepcopy(haploid.functions[node])  
+                        dominances[node] = copy.deepcopy(haploid.dominances[node])
+                        for previous_node in previous_layer :
+                            connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
+                    else : 
+                        biases[node] = copy.deepcopy(other_haploid.biases[node])
+                        functions[node] = copy.deepcopy(other_haploid.functions[node])  
+                        dominances[node] = copy.deepcopy(other_haploid.dominances[node])
+                        for previous_node in previous_layer :    
+                            connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])                                
 
             previous_layer = haploid.nodes[index_of_layer]
+        
+        nodes = copy.deepcopy(haploid.nodes)
 
-        return connections, biases, functions
+        return connections, biases, functions, dominances, nodes 
+    
 
+    def mutate(self, genome, sigma_weight, sigma_bias, threshold_weight, threshold_bias, threshold_function, threshold_dominance, functions_pool) : 
 
+        for node in genome.connections :
+            if np.random.uniform() < threshold_weight  :
+                genome.connections[node] += np.random.normal(loc = 0, scale = sigma_weight )
+    
+        for node in genome.biases :
+            if np.random.uniform() < threshold_bias :
+                genome.biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
+
+        list_of_keys = list(functions_pool.keys())
+        for node in genome.functions :
+            if node in genome.nodes[-1] :
+                continue 
+            if np.random.uniform() < threshold_function :
+                choice = np.random.randint(0, len(list_of_keys))
+                new_function = functions_pool[list_of_keys[choice]]
+                while genome.functions[node] == new_function :
+                    choice = np.random.randint(0, len(list_of_keys))
+                    new_function = functions_pool[list_of_keys[choice]]
+                genome.functions[node] = new_function
+
+        for node in genome.dominances :
+            if np.random.uniform() < threshold_dominance :
+                choice = np.random.randint(0, self.config.number_of_dominances + 1)                     
+                while genome.dominances[node] == choice :
+                    choice = np.random.randint(0, self.config.number_of_dominances + 1)
+                genome.dominances[node] = choice 
+
+        return genome 
 
 
         
