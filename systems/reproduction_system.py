@@ -127,7 +127,7 @@ class HaploidReproductionSystem :
             children_entity_ids.append(elite)
             age = registry.get_age(elite).age 
             birthday = age + 1
-            registry.add_parents(elite, elite, elite, 0, 0)
+            registry.add_haploid_parents(elite, elite, elite)
             registry.modify_age(elite, birthday)
 
         while len(children_entity_ids) < max_population : 
@@ -138,11 +138,11 @@ class HaploidReproductionSystem :
                 parent2 = parents_ids.pop()
                 haploid_parent1 = registry.get_haploid(parent1)
                 haploid_parent2 = registry.get_haploid(parent2)
-                connections, biases, functions, dominances, nodes = self.genome_operator.crossover(genome_parent1, genome_parent2)
+                connections, biases, functions, dominances, nodes = self.genome_operator.crossover(haploid_parent1, haploid_parent2)
                 child_id = self.entity_manager.create_entity()
                 children_entity_ids.append(child_id)
-                registry.add_parents(child_id, parent1, parent2, choice1, choice2)
-                registry.add_genome(child_id, connections[0], connections[1], biases[0], biases[1], functions[0], functions[1], dominances[0], dominances[1], nodes)
+                registry.add_haploid_parents(child_id, parent1, parent2)
+                registry.add_haploid(child_id, connections, biases, functions, dominances, nodes)
                 registry.add_age(child_id, age)
 
             tournament_ids = rd.sample(entity_ids, number_in_tournament)
@@ -155,19 +155,17 @@ class HaploidReproductionSystem :
             
         for child_entity_id in children_entity_ids :
             if child_entity_id not in elitism :
-                genome = registry.get_genome(child_entity_id)
-                new_genome = self.genome_operator.mutate(genome, self.config.sigma_weight, self.config.sigma_bias, self.config.threshold_weight, self.config.threshold_bias, self.config.threshold_function, self.config.threshold_dominance, self.function_pool.pool)
-                registry.add_genome(child_entity_id, new_genome.connections[0], new_genome.connections[1], new_genome.biases[0], new_genome.biases[1], new_genome.functions[0], new_genome.functions[1], new_genome.dominances[0], new_genome.dominances[1], new_genome.nodes)                                        
+                haploid = registry.get_haploid(child_entity_id)
+                new_haploid = self.genome_operator.mutate(haploid, self.config.sigma_weight, self.config.sigma_bias, self.config.threshold_weight, self.config.threshold_bias, self.config.threshold_function, self.config.threshold_dominance, self.function_pool.pool)
+                registry.add_haploid(child_entity_id, new_haploid.connections, new_haploid.biases, new_haploid.functions, new_haploid.dominances, new_haploid.nodes)                                        
             
 
         
-        all_alive_entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
+        all_alive_entity_ids = [id for id in registry.get_all_id_with_haploid() if self.entity_manager.is_alive(id)]
         for entity_id in all_alive_entity_ids :
             if entity_id not in children_entity_ids:
                 self.entity_manager.destroy_entity(entity_id)
                 registry.clear_ind_from_registry(entity_id)
-
-
-            
+                # clear for RAM purposes
 
         self.results_manager.end_generation()

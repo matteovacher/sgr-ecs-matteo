@@ -186,6 +186,10 @@ class ResultsManager :
     def ask_action(self) :
         action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [genealogy] / [render genealogy] / [save family] / [save individual] / [distance] / [anything else to quit] \n \t')
         return action
+    
+    def ask_haploid_action(self) :
+        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [haploid genealogy] / [render haploid genealogy] / [save haploid family] / [save individual] / [distance] / [anything else to quit] \n \t')
+        return action
 
     def load_ind(self) :
         gen = input("Please indicate the generation of the generation of the individual you want to render : ")
@@ -425,6 +429,106 @@ class ResultsManager :
         else :  
             return False
         
+    def explore_haploid_genealogy(self) :
+        generation = input('Please indicate the generation of the individual you want to explore the genealogy : ')
+        id = input('Please indicate the ID of the individual you want to explore : ')
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        generation = int(generation)
+        id = int(id)
+        print('\n ----- Loading the save ----- \n')
+        
+        for i in range(3) :
+            file = '{}_body_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+
+            file = '{}_fitness_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+            
+            file = '{}_haploid_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+
+            file = '{}_haploid_parents_registry.pkl'.format(generation - i)
+            file_dir = os.path.join(self.pkl_dir, file)
+            with open(file_dir, 'rb') as f : 
+                if file.endswith('.pkl') :
+                    file = file.removesuffix('.pkl')
+                loaded_object = dill.load(f)
+                self.__setattr__(file, loaded_object)
+
+        idddd = int(id)
+        genealogy = [[id]]
+        for i in range(3 - 1) :
+            all_parents = []
+            ids_to_get_parent = genealogy[i]
+            name_parents_registry = '{}_haploid_parents_registry'.format(generation - i)
+            parents_registry = getattr(self, name_parents_registry)
+            for id in ids_to_get_parent : 
+                parents = parents_registry[(generation - i, id)].parents
+                parent1, parent2 = parents[0], parents[1]
+                all_parents.append(parent1)
+                all_parents.append(parent2)
+            genealogy.append(all_parents)
+
+
+        name_parents_registry = '{}_haploid_parents_registry'.format(generation)
+        parents_registry = getattr(self, name_parents_registry)
+        parent1 = parents_registry[(generation, idddd)].parents[0]
+        parent2 = parents_registry[(generation, idddd)].parents[1]
+
+          
+        print('I will try to print the genealogy so that it is readable')
+        for i in range(len(genealogy)) :
+        
+            print('\n ----- Generation {} ----- \n'.format(generation - 2 + i))
+            for id in genealogy[2 - i] :
+                if i == 0 :
+                    name_body = '{}_body_registry'.format(generation - 2 + i)
+                    name_fitness = '{}_fitness_registry'.format(generation - 2 + i)
+                    name_haploid = '{}_haploid_registry'.format(generation - 2 + i)
+                    body_registry = getattr(self, name_body)
+                    fitness_registry = getattr(self, name_fitness)
+                    haploid_registry = getattr(self, name_haploid)
+                    print('ID : {}'.format(id))
+                    print('The fitness of this individual is : {}'.format(fitness_registry[(generation - 2 + i, id)].fitness))
+                    print('The body of this individual is : \n{}'.format(body_registry[(generation - 2 + i, id)].body))
+                    print('The Dominances of this individual is : \n{}'.format(haploid_registry[(generation - 2 + i, id)].dominances))
+                    print('')
+                else :
+                    name_parents = '{}_haploid_parents_registry'.format(generation - 2 + i)
+                    name_body = '{}_body_registry'.format(generation - 2 + i)
+                    name_fitness = '{}_fitness_registry'.format(generation - 2 + i)
+                    name_haploid = '{}_haploid_registry'.format(generation - 2 + i)
+                    parents_registry = getattr(self, name_parents)
+                    body_registry = getattr(self, name_body)
+                    fitness_registry = getattr(self, name_fitness)
+                    haploid_registry = getattr(self, name_haploid)
+                    print('ID : {}'.format(id))
+                    print('The parents of this individual are : {} and {}'.format(parents_registry[(generation - 2 + i, id)].parents[0], parents_registry[(generation - 2 + i, id)].parents[1]))
+                    print('The fitness of this individual is : {}'.format(fitness_registry[(generation - 2 + i, id)].fitness))
+                    print('The body of this individual is : \n{}'.format(body_registry[(generation - 2 + i, id)].body))
+                    print('The Dominances of this individual is : \n{}'.format(haploid_registry[(generation - 2 + i, id)].dominances))
+                    print('')
+
+        if exit == "y" : 
+            return True  
+        else :  
+            return False
+        
     def render_family(self) :
         generation = input("Please indicate the generations of the family you want to render : ")
         ind = input("Please indicate the ID of the individual you want to render : ")
@@ -461,6 +565,43 @@ class ResultsManager :
         else : 
             return False, generation, ind, genealogy
         
+    def render_haploid_family(self) :
+        generation = input("Please indicate the generations of the family you want to render : ")
+        ind = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+
+        print('\n ----- Loading the save ----- \n')
+        for i in range(3) :
+            for file in os.listdir(self.pkl_dir) :
+                if file.startswith('{}'.format(generation - i)) :
+                    file_dir = os.path.join(self.pkl_dir, file)
+                    with open(file_dir, 'rb') as f : 
+                        if file.endswith('.pkl') :
+                            file = file.removesuffix('.pkl')
+                        loaded_object = dill.load(f)
+                        self.__setattr__(file, loaded_object)
+        
+        genealogy = [[ind]]
+        for i in range(3 - 1) :
+            all_parents = []
+            ids_to_get_parent = genealogy[i]
+            name_parents_registry = '{}_haploid_parents_registry'.format(generation - i)
+            parents_registry = getattr(self, name_parents_registry)
+            for id in ids_to_get_parent : 
+                parents = parents_registry[(generation - i, id)].parents
+                parent1, parent2 = parents[0], parents[1]
+                all_parents.append(parent1)
+                all_parents.append(parent2)
+            genealogy.append(all_parents)
+
+        if exit == "y" :
+            return True, generation, ind, genealogy
+        else : 
+            return False, generation, ind, genealogy
+        
+        
     def save_family(self) :
         generation = input("Please indicate the generations of the family you want to render : ")
         ind = input("Please indicate the ID of the individual you want to render : ")
@@ -484,6 +625,42 @@ class ResultsManager :
             all_parents = []
             ids_to_get_parent = genealogy[i]
             name_parents_registry = '{}_parents_registry'.format(generation - i)
+            parents_registry = getattr(self, name_parents_registry)
+            for id in ids_to_get_parent : 
+                parents = parents_registry[(generation - i, id)].parents
+                parent1, parent2 = parents[0], parents[1]
+                all_parents.append(parent1)
+                all_parents.append(parent2)
+            genealogy.append(all_parents)
+
+        if exit == "y" :
+            return True, generation, ind, genealogy
+        else : 
+            return False, generation, ind, genealogy
+        
+    def save_haploid_family(self) :
+        generation = input("Please indicate the generations of the family you want to render : ")
+        ind = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+
+        print('\n ----- Loading the save ----- \n')
+        for i in range(3) :
+            for file in os.listdir(self.pkl_dir) :
+                if file.startswith('{}'.format(generation - i)) :
+                    file_dir = os.path.join(self.pkl_dir, file)
+                    with open(file_dir, 'rb') as f : 
+                        if file.endswith('.pkl') :
+                            file = file.removesuffix('.pkl')
+                        loaded_object = dill.load(f)
+                        self.__setattr__(file, loaded_object)
+        
+        genealogy = [[ind]]
+        for i in range(3 - 1) :
+            all_parents = []
+            ids_to_get_parent = genealogy[i]
+            name_parents_registry = '{}_haploid_parents_registry'.format(generation - i)
             parents_registry = getattr(self, name_parents_registry)
             for id in ids_to_get_parent : 
                 parents = parents_registry[(generation - i, id)].parents

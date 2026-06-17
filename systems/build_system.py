@@ -24,7 +24,7 @@ class BuildSystem :
             registry.add_age(entity_id, 1)
         self.results_manager.starting(self.config)
 
-class BuildHaploidSystem() :
+class HaploidBuildSystem() :
     
     def __str__(self) :
         return "BuildHaploidSystem"

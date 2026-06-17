@@ -16,6 +16,10 @@ class ParentsComponent :
         self.parents_choices = [choice1, choice2]
         # choice 1 means choice for parent 1 will be 0 or  0 means first chrom and 1 means the 2nd
 
+class HaploidParentsComponent :
+    def __init__(self, parent1, parent2) :
+        self.parents = [parent1, parent2]
+
 class AgeComponent :
     def __init__(self, age) :
         self.age = age

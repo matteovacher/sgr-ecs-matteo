@@ -197,7 +197,7 @@ def render() :
             io.imwrite(image_path, image)
 
         elif action == 'distance' :
-             exit = results_manager.print_distance(distance_tool)
+            exit = results_manager.print_distance(distance_tool)
 
 
         else :

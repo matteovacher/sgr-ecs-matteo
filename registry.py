@@ -16,6 +16,7 @@ class ComponentRegistry :
         self.statistic_registry = {}
         self.parents_registry = {}
         self.haploid_registry = {}
+        self.haploid_parents_registry = {}
 
     # ADDER METHODS 
     def add_genome(self, entity_id, connections1, connections2, bias1, bias2, function1, function2, dominance1, dominance2, nodes) :
@@ -57,6 +58,9 @@ class ComponentRegistry :
     def add_parents(self, entity_id, parent1, parent2, choice1, choice2) :
         self.parents_registry[entity_id] = ParentsComponent(parent1, parent2, choice1, choice2)
 
+    def add_haploid_parents(self, entity_id, parent1, parent2) :
+        self.haploid_parents_registry[entity_id] = HaploidParentsComponent(parent1, parent2)
+
     # GETTER METHODS 
     def get_genome(self, entity_id) :
         return self.genome_registry[entity_id]
@@ -96,7 +100,11 @@ class ComponentRegistry :
     
     def get_parents(self, entity_id) :
         return self.parents_registry[entity_id]
-        
+
+    def get_haploid_parents(self, entity_id) :
+        return self.haploid_parents_registry[entity_id]
+
+
     # ADVANCED GETTER METHODS
     def get_all_id_with_genome(self) :
         return self.genome_registry.keys()
