@@ -32,10 +32,32 @@ class ResultsManager :
             os.makedirs(json_dir, exist_ok=True)
             os.makedirs(pkl_dir, exist_ok=True) 
             os.makedirs(txt_dir, exist_ok=True)
-
         else : 
             self.save = False 
         print('\n')
+    
+    def add_results_both_path(self) : 
+        save = input("Do you want to save the results of this simulation ? \n \t [y] / [n] \n \t")
+        if save == "y" : 
+            self.save = True 
+            path = input("Where do you want to store these data (please indicate the desired folder in results) : ")
+            number = input("In order to classify the results, please indicate the experiment ID : ")
+            self.path = path 
+            self.number = number
+            local_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            results_dir = os.path.join(local_dir, "results")
+            self.abs_path_results = os.path.join(results_dir, '{}'.format(path), 'id_{}'.format(number))
+            json_dir = os.path.join(self.abs_path_results, 'json')
+            pkl_dir = os.path.join(self.abs_path_results, 'pkl')
+            txt_dir = os.path.join(self.abs_path_results, 'txt')
+            os.makedirs(json_dir, exist_ok=True)
+            os.makedirs(pkl_dir, exist_ok=True) 
+            os.makedirs(txt_dir, exist_ok=True)
+        else : 
+            self.save = False 
+        print('\n')
+
+    
     
     def save_results(self, registry, config) :
         print('\n----- Saving JSON -----\n')
