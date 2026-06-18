@@ -3,7 +3,7 @@ import os
 import json 
 import dill 
 import time 
-
+import copy 
 
 class ResultsManager :
 
@@ -47,12 +47,17 @@ class ResultsManager :
             local_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             results_dir = os.path.join(local_dir, "results")
             self.abs_path_results = os.path.join(results_dir, '{}'.format(path), 'id_{}'.format(number))
-            json_dir = os.path.join(self.abs_path_results, 'json')
-            pkl_dir = os.path.join(self.abs_path_results, 'pkl')
-            txt_dir = os.path.join(self.abs_path_results, 'txt')
-            os.makedirs(json_dir, exist_ok=True)
-            os.makedirs(pkl_dir, exist_ok=True) 
-            os.makedirs(txt_dir, exist_ok=True)
+            self.abs_path_diploid = os.path.join(self.abs_path_results, 'diploid')
+            os.makedirs(self.abs_path_diploid, exist_ok=True)
+            self.abs_path_haploid = os.path.join(self.abs_path_results, 'haploid')
+            os.makedirs(self.abs_path_haploid, exist_ok=True)
+            for dir in [self.abs_path_diploid, self.abs_path_haploid] : 
+                json_dir = os.path.join(dir, 'json')
+                pkl_dir = os.path.join(dir, 'pkl')
+                txt_dir = os.path.join(dir, 'txt')
+                os.makedirs(json_dir, exist_ok=True)
+                os.makedirs(pkl_dir, exist_ok=True) 
+                os.makedirs(txt_dir, exist_ok=True)
         else : 
             self.save = False 
         print('\n')
@@ -74,7 +79,20 @@ class ResultsManager :
                 dill.dump(registry.statistic_registry, f)
             print('\n----- Statistic registry saved successfully -----\n')
 
+    def save_both_results(self, registry, config, type_genome) :
+        print('\n----- Saving JSON -----\n')
+        if self.save == True : 
+            save_config_path = os.path.join(self.abs_path_results, type_genome, 'json', 'configs.json')
+            with open(save_config_path, 'w') as f : 
+                json.dump(config.__dict__, f, indent = 4)
 
+            print('\n----- JSON Saved Successfully -----\n\n')
+
+            print('\n----- Saving statistic_registry -----\n')
+            component_path = os.path.join(self.abs_path_results, type_genome, 'pkl', 'statistic_registry.pkl')
+            with open(component_path, 'wb') as f : 
+                dill.dump(registry.statistic_registry, f)
+            print('\n----- Statistic registry saved successfully -----\n')
 
 
     def save_generation_registry(self, component_registry, name, generation  ) :
@@ -82,6 +100,17 @@ class ResultsManager :
         time_1 = time.time()
         if self.save == True :
             component_path = os.path.join(self.abs_path_results, 'pkl', '{}_{}.pkl'.format(generation, name))
+            with open(component_path, 'wb') as f : 
+                dill.dump(component_registry, f)
+            print('\n----- {} saved successfully -----\n'.format(name))
+            time_2 = time.time()
+            print('This took {} s.'.format(time_2 - time_1))
+
+    def save_both_generation_registry(self, component_registry, name, generation, type_genome) :
+        print('\n----- Saving {} of Generation {} -----\n'.format(name, generation))
+        time_1 = time.time()
+        if self.save == True :
+            component_path = os.path.join(self.abs_path_results, type_genome, 'pkl', '{}_{}.pkl'.format(generation, name))
             with open(component_path, 'wb') as f : 
                 dill.dump(component_registry, f)
             print('\n----- {} saved successfully -----\n'.format(name))
@@ -101,11 +130,28 @@ class ResultsManager :
             comments = input("Please indicate the desired comments for the text file report : \n")
             f.write('Comments : {}\n\n'.format(comments))
 
+    def begin_both_txt_file(self, systems, type_genome) :
+        txt_file_dir = os.path.join(self.abs_path_results, type_genome, 'txt', 'all_info')
+        with open(txt_file_dir, 'a') as f :
+            f.write('\nHere the different systems below are being used :\n')
+            for system in systems :
+                f.write('\t + {}\n'.format(system))
+            f.write('\n')
+            comments = input("Please indicate the desired comments for the text file report : \n")
+            f.write('Comments : {}\n\n'.format(comments))
+
+
 
     def _log(self, result):
         print(result)
         if self.save:
             with open(os.path.join(self.abs_path_results, 'txt', 'all_info'), 'a') as f:
+                f.write(result)
+    
+    def _log_both(self, result, type_genome) :
+        print(result)
+        if self.save:
+            with open(os.path.join(self.abs_path_results, type_genome, 'txt', 'all_info'), 'a') as f:
                 f.write(result)
 
     def starting(self, config):
@@ -117,17 +163,39 @@ class ResultsManager :
         result += '\n'
         self._log(result)
 
+    def starting_both(self, config, type_genome) :
+        result = '\n'
+        result += '----- Running with the following config -----\n'
+        result += '\n'
+        for key, value in config.__dict__.items():
+            result += f'{key} : {value}\n'
+        result += '\n'
+        self._log_both(result, type_genome)
+
+
     def end_generation(self) :
         passed = time.time() - self.time
         result = f'\nTHIS GENERATION TOOK {passed:.3f} s.\n'
         result += '\n'
         self._log(result)
+
+    def end_both_generation(self, type_genome) :
+        passed = time.time() - self.time
+        result = f'\nTHIS GENERATION TOOK {passed:.3f} s.\n'
+        result += '\n'
+        self._log_both(result)
        
     def start_generation(self, generation, config) :
         self.time = time.time()
         result = f'----- Starting generation number {generation} out of {config.generations} -----\n'
         result += '\n'
         self._log(result)
+
+    def start_both_generation(self, generation, config, type_genome) :
+        self.time = time.time()
+        result = f'----- Starting generation number {generation} out of {config.generations} -----\n'
+        result += '\n'
+        self._log_both(result, type_genome)
        
 
     def bests(self, bests) :
@@ -138,6 +206,16 @@ class ResultsManager :
             result += f'\t {id} \t {fitness:.3f} \t\t {age}\n'
         result += '\n'
         self._log(result)
+
+    def both_bests(self, bests, type_genome) :
+        result = '----- Bests of this generation -----\n'
+        result += '\t ID \t Fitness \t Age\n'
+        result += '\t====\t=========\t=====\n'
+        for id, fitness, age in bests :
+            result += f'\t {id} \t {fitness:.3f} \t\t {age}\n'
+        result += '\n'
+        self._log_both(result, type_genome)
+
 
     def average_best(self, bests) :
         fitnesses = []
@@ -158,6 +236,24 @@ class ResultsManager :
         self._log(result)
         return best_id, fitness_best, average, sigma
 
+    def both_average_best(self, bests, type_genome) :
+        fitnesses = []
+        ids = []
+        best_id = bests[0][0]
+        fitness_best = bests[0][1]
+        for id, fitness, _ in bests :
+            ids.append(id)
+            fitnesses.append(fitness)
+            average = sum(fitnesses) / len(fitnesses)
+            averages = [average for _ in range(len(fitnesses))]
+            diff = [0 for _ in range(len(averages))]
+        for i in range(len(fitnesses)):
+            diff[i] = (fitnesses[i] - averages[i]) ** 2
+        sigma = math.sqrt(sum(diff) / len(diff))
+        result = f'The average of the bests is {average:.3f} with a standard deviation of {sigma:.3f}\n'
+        result += '\n'
+        self._log_both(result, type_genome)
+        return best_id, fitness_best, average, sigma
        
 
     def average_ind(self, all_ind) :
@@ -175,12 +271,34 @@ class ResultsManager :
         result += '\n'
         self._log(result)
         return average, sigma
+    
+    def both_average_ind(self, all_ind, type_genome) :
+        average = sum(all_ind) / len(all_ind)
+        averages = [average for _ in range(len(all_ind))]
+        diff = [0 for _ in range(len(averages))]
+        for i in range(len(all_ind)):
+            diff[i] = (all_ind[i] - averages[i]) ** 2
+        sigma = math.sqrt(sum(diff) / len(diff))
+        result = f'----- Statistics of this generation -----\n\n'
+        result += f'Here is the total average of this generation : {average:.3f}\n'
+        result += 'Please be careful, this fitness depends on how you treat the individual with an invalid body, what fitness is attributed, do you even count these individuals ? Here it should be calculated only with the valid individuals.\n'
+        result += 'Here all the valid individuals are considered.\n'
+        result += f'Anyway the standard deviation of the fitness is {sigma:.3f}\n'
+        result += '\n'
+        self._log_both(result)
+        return average, sigma
+
+
        
     def deficient(self, number) :
         results = f'The number of deficient individuals on this generation is {number}. IE with an invalid body. '
         results += '\n'
         self._log(results)  
 
+    def both_deficient(self, number, type_genome) :
+        results = f'The number of deficient individuals on this generation is {number}. IE with an invalid body. '
+        results += '\n'
+        self._log_both(results, type_genome)
 
 
     def loader(self) : 
@@ -205,6 +323,57 @@ class ResultsManager :
         print('\n ----- Config loaded ----- \n')
         return False 
     
+    def both_loader(self, type_genome) :
+        path = input('From which folder do you want to get the results : ')
+        number = input('From which experiment ID do you want to get the results : ')
+        self.init_load = True 
+        local_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        results_dir = os.path.join(local_dir, 'results', '{}'.format(path), 'id_{}'.format(number))
+        self.results_dir = results_dir
+
+        print('\n ----- Loading the Config ----- \n')
+
+        diploid_json_dir  = os.path.join(results_dir, type_genome, 'json')
+        diploid_pkl_dir = os.path.join(results_dir, type_genome, 'pkl')
+
+        self.diploid_json_dir = diploid_json_dir
+        self.diploid_pkl_dir = diploid_pkl_dir
+
+        haploid_json_dir  = os.path.join(results_dir, 'json')
+        haploid_pkl_dir = os.path.join(results_dir, 'pkl')
+
+        self.haploid_json_dir = haploid_json_dir
+        self.haploid_pkl_dir = haploid_pkl_dir
+
+        json_diploid = os.path.join(diploid_json_dir, 'configs.json')
+        with open(json_diploid, 'r') as f : 
+            data_config = json.load(f)
+            self.__setattr__('config_diploid', data_config)
+
+        json_haploid = os.path.join(haploid_json_dir, 'configs.json')
+        with open(json_haploid, 'r') as f : 
+            data_config = json.load(f)
+            self.__setattr__('config_haploid', data_config)
+
+        
+        print('\n ----- Config loaded ----- \n')
+        return False
+
+        # json_dir  = os.path.join(results_dir, 'json')
+        # self.pkl_dir = os.path.join(results_dir, 'pkl')
+
+        # print('\n ----- Loading the Config ----- \n')
+        # file = 'configs.json'
+        # json_dir_file = os.path.join(json_dir, file)
+        # with open(json_dir_file, 'r') as f : 
+        #     if file.endswith('.json') :
+        #         file = file.removesuffix('.json')
+        #     data_config = json.load(f)
+        #     self.__setattr__(file, data_config)
+
+        # print('\n ----- Config loaded ----- \n')
+    
+    
     def ask_action(self) :
         action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [genealogy] / [render genealogy] / [save family] / [save individual] / [distance] / [anything else to quit] \n \t')
         return action
@@ -212,6 +381,15 @@ class ResultsManager :
     def ask_haploid_action(self) :
         action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [haploid genealogy] / [render haploid genealogy] / [save haploid family] / [save individual] / [distance] / [anything else to quit] \n \t')
         return action
+    
+    def ask_both_action(self) : 
+        type_genome = input('Do you want to study the haploid or the diploid genome ?\n \t [diploid] / [haploid] / [anything else to quit]\n \t')
+        if type_genome == 'diploid' :
+            action = self.ask_action()
+        elif type_genome == 'haploid' :
+            action = self.ask_haploid_action()
+        return type_genome, action
+            
 
     def load_ind(self) :
         gen = input("Please indicate the generation of the generation of the individual you want to render : ")
@@ -233,6 +411,28 @@ class ResultsManager :
         else :  
             return False,gen, id
         
+    def load_both_ind(self, type_genome) :
+        gen = input("Please indicate the generation of the generation of the individual you want to render : ")
+        id = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        
+        print('\n----- Loading the save ----- \n')
+        dir = os.path.join(self.results_dir, type_genome, 'pkl')
+        for file in os.listdir(dir) :
+            if file.startswith('{}'.format(gen)) :
+                file_dir = os.path.join(self.pkl_dir, file)
+                with open(file_dir, 'rb') as f : 
+                    if file.endswith('.pkl') :
+                        file = file.removesuffix('.pkl')
+                    loaded_object = dill.load(f)
+                    self.__setattr__(file, loaded_object)
+        print('\n----- Save loaded ----- \n')
+        if exit == "y" : 
+            return True, gen, id  
+        else :  
+            return False,gen, id    
+        
+        
     def save_body(self) :
         generation = input("Please indicate the generation of the body you want to render : ")
         ind = input("Please indicate the ID of the individual you want to render : ")
@@ -242,6 +442,26 @@ class ResultsManager :
         print('\n----- Loading the save ----- \n')
         file = '{}_body_registry.pkl'.format(generation)
         file_dir = os.path.join(self.pkl_dir, file)
+        with open(file_dir, 'rb') as f :    
+            if file.endswith('.pkl') :  
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+        print('\n----- Save loaded ----- \n')
+        if exit == "y" : 
+            return True, generation, ind  
+        else :  
+            return False, generation, ind
+        
+    def save_both_body(self, type_genome) :
+        generation = input("Please indicate the generation of the body you want to render : ")
+        ind = input("Please indicate the ID of the individual you want to render : ")
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+        print('\n----- Loading the save ----- \n')
+        file = '{}_body_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.results_dir, type_genome, 'pkl', file)
         with open(file_dir, 'rb') as f :    
             if file.endswith('.pkl') :  
                 file = file.removesuffix('.pkl')
@@ -271,6 +491,43 @@ class ResultsManager :
 
         file = '{}_fitness_registry.pkl'.format(generation)
         file_dir = os.path.join(self.pkl_dir, file)
+        with open(file_dir, 'rb') as f : 
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+        print('\n ----- Save loaded ----- \n')
+
+        name_body = '{}_body_registry'.format(generation)
+        name_fitness = '{}_fitness_registry'.format(generation)
+
+        body_registry = self.__getattribute__(name_body)
+        fitness_registry = self.__getattribute__(name_fitness)
+        print('Here is the body of the individual {} of generation {} with fitness {} : \n'.format(ind, generation, fitness_registry[(generation, ind)].fitness))
+        print(body_registry[(generation, ind)].body)
+        if exit == "y" : 
+            return True
+        else :  
+            return False
+        
+    def print_both_body(self, type_genome) :
+        generation = input('Please indicate the generation of the body you want to print : ')
+        ind = input('Please indicate the ID of the individual you want to print : ')
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        ind = int(ind)
+        generation = int(generation)
+        print('\n ----- Loading the save ----- \n')
+        
+        file = '{}_body_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.results_dir, type_genome, 'pkl', file)
+        with open(file_dir, 'rb') as f :    
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+
+        file = '{}_fitness_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.results_dir, type_genome, 'pkl', file)
         with open(file_dir, 'rb') as f : 
             if file.endswith('.pkl') :
                 file = file.removesuffix('.pkl')
@@ -332,7 +589,48 @@ class ResultsManager :
         else :  
             return False
         
+    def print_both_bodies(self, type_genome) :
+        generation = input('Please indicate the generation of the bodies you want to print : ')
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+
+        print('\n ----- Loading the save ----- \n')
+        
+        file = '{}_body_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.results_dir, type_genome, 'pkl', file)
+        with open(file_dir, 'rb') as f : 
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+
+        file = '{}_fitness_registry.pkl'.format(generation)
+        file_dir = os.path.join(self.results_dir, type_genome, 'pkl', file)
+        with open(file_dir, 'rb') as f : 
+            if file.endswith('.pkl') :
+                file = file.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file, loaded_object)
+        print('\n ----- Save loaded ----- \n')
+        
+        print('\n ----- Loading the bodies of generation {} ----- \n'.format(generation))
+        attr_name = '{}_body_registry'.format(generation)
+        fitness_name = '{}_fitness_registry'.format(generation)
+        body_registry = getattr(self, attr_name)
+        fitness_registry = getattr(self, fitness_name)
+        keys = [key for key in body_registry if key[0] == int(generation)]
+
+        for key in keys : 
+            print('Here is the body of individual {} : with a fitness of {}\n'.format(key[1], fitness_registry[key].fitness))
+            print(body_registry[key].body)
+            print('')
+    
+        if exit == "y" : 
+            return True 
+        else :  
+            return False
+        
     def explore_genealogy(self) :
+        
         generation = input('Please indicate the generation of the individual you want to explore the genealogy : ')
         id = input('Please indicate the ID of the individual you want to explore : ')
         exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
@@ -551,6 +849,18 @@ class ResultsManager :
         else :  
             return False
         
+    
+    def explore_both_genealogy(self, type_genome) :
+        if type_genome == "diploid" :
+            self.pkl_dir = copy.deepcopy(self.diploid_pkl_dir)
+            return self.explore_genealogy()
+        elif type_genome == "haploid" :
+            self.pkl_dir = copy.deepcopy(self.haploid_pkl_dir)
+            return self.explore_haploid_genealogy()
+        else : 
+            return True 
+        
+
     def render_family(self) :
         generation = input("Please indicate the generations of the family you want to render : ")
         ind = input("Please indicate the ID of the individual you want to render : ")
@@ -623,6 +933,18 @@ class ResultsManager :
         else : 
             return False, generation, ind, genealogy
         
+    
+    def render_both_family(self, type_genome) :
+        if type_genome == "diploid" :
+            self.pkl_dir = copy.deepcopy(self.diploid_pkl_dir)
+            return self.render_family()
+        elif type_genome == "haploid" :
+            self.pkl_dir = copy.deepcopy(self.haploid_pkl_dir)
+            return self.render_haploid_family()
+        else : 
+            return True, 0, 0, 0
+        
+    
         
     def save_family(self) :
         generation = input("Please indicate the generations of the family you want to render : ")
@@ -695,6 +1017,18 @@ class ResultsManager :
             return True, generation, ind, genealogy
         else : 
             return False, generation, ind, genealogy
+        
+    def save_both_family(self, type_genome) : 
+        if type_genome == "diploid" :
+            self.pkl_dir = copy.deepcopy(self.diploid_pkl_dir)
+            return self.save_family()
+        elif type_genome == "haploid" :
+            self.pkl_dir = copy.deepcopy(self.haploid_pkl_dir)
+            return self.save_haploid_family()
+        else : 
+            return True, 0, 0, 0
+        
+            
         
     def print_distance(self, distance_tool) :
         generation1 = input('Please indicate the generation of the first individual : ')

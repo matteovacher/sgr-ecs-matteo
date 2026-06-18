@@ -9,6 +9,13 @@ class World :
         self._end_systems = []
         self.all_systems = []
 
+    def reset(self) : 
+        self.registry.clear_all()
+        self._builder_systems.clear()
+        self._step_systems.clear()
+        self._end_systems.clear()
+        self.all_systems.clear()
+
     def add_builder_system(self, system) : 
         self._builder_systems.append(system)
         self.all_systems.append(system)

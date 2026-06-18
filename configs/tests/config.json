@@ -16,7 +16,7 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 5, 
+    "generations" : 4, 
     "population" : 100, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 5, 

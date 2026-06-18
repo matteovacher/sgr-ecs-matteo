@@ -138,9 +138,9 @@ class ComponentRegistry :
     
 
     # CLEARER METHODS 
-    def clear_all(self) :
-        for key, _  in self.__dict__.items():
-            self[key].clear()
+    def clear_all(self):
+        for registry in self.__dict__.values() :
+            registry.clear()
 
     def clear_ind_from_registry(self , entity_id) :
         for registry in self.__dict__.values() :
