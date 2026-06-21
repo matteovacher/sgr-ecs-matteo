@@ -2,6 +2,7 @@ import os
 import json  
 import time
 import imageio as io 
+import copy 
 
 from config import Config 
 
@@ -75,7 +76,7 @@ def main() :
 
     world.add_end_system(save_system)
     
-    results_manager.begin_both_txt_file(world.all_systems)
+    results_manager.begin_both_txt_file(world.all_systems, type_genome)
 
     world.build()
     for generation in range(config.generations) :
@@ -87,6 +88,8 @@ def main() :
     print("Total time : ", time2 - time1)
 
     world.reset()
+    # entity_manager.reset()
+    # not reset yet because i want to see if my render works and for that i need diff id for entities 
 
     type_genome = 'haploid'
 
@@ -109,7 +112,7 @@ def main() :
 
     world.add_end_system(save_system)
 
-    results_manager.begin_both_txt_file(world.all_systems)
+    results_manager.begin_both_txt_file(world.all_systems, type_genome)
 
     world.build()
     for generation in range(config.generations) :
@@ -123,4 +126,167 @@ def main() :
     
 
 def render() :
-    pass
+    
+    results_manager = ResultsManager()
+    exit = results_manager.both_loader()
+
+    diploid_config = Config(copy.deepcopy(results_manager.config_diploid))
+    haploid_config = Config(copy.deepcopy(results_manager.config_haploid))
+
+    haploid_network_manager = NetworkManager(haploid_config)
+    diploid_network_manager = NetworkManager(diploid_config)
+
+    diploid_robot_simulator = RobotSimulator(diploid_config)
+    haploid_robot_simulator = RobotSimulator(haploid_config)
+
+    diploid_distance_tool = DistanceTool(diploid_config)
+    haploid_distance_tool = DistanceTool(haploid_config)
+
+    # Here they are the same because same config 
+    
+    while exit == False : 
+        type_genome, action = results_manager.ask_both_action()
+
+        if type_genome == 'diploid' :
+            robot_simulator = diploid_robot_simulator
+            network_manager = diploid_network_manager
+            distance_tool = diploid_distance_tool
+            config = diploid_config
+        elif type_genome == 'haploid' :
+            robot_simulator = haploid_robot_simulator
+            network_manager = haploid_network_manager
+            distance_tool = haploid_distance_tool
+            config = haploid_config
+        else :
+            raise Exception('The type of genome is not valid')
+
+        if action == 'bodies' :
+            exit = results_manager.print_both_bodies(type_genome)
+        
+        elif action == 'render' :
+            exit, gen, id = results_manager.load_both_ind(type_genome)
+
+            gen, id = int(gen), int(id)
+            key = (gen, id)
+
+
+            video_dir = os.path.join(results_manager.results_dir, type_genome, 'video')
+            os.makedirs(video_dir, exist_ok=True)
+
+            video_mp4_path = os.path.join(video_dir, 'gen_{}_id_{}.mp4'.format(gen, id))
+            # video_gif_path = os.path.join(video_dir, 'gen_{}_id_{}.gif'.format(gen, id))
+
+            print('\n----- Simulating the simulation -----\n')
+            name_body = '{}_body_registry'.format(gen)
+            name_controller_network = '{}_controller_network_registry'.format(gen)
+            body_registry = getattr(results_manager, name_body)
+            controller_network_registry = getattr(results_manager, name_controller_network)
+            body = body_registry[key]
+            controller_network = controller_network_registry[key]
+            print(config)
+
+            images, _ = robot_simulator.simulate_render(body.body, controller_network, network_manager, config.n_steps)
+
+            print('\n----- Rendering the simulation -----\n')
+            io.mimwrite(video_mp4_path, images, fps=30, macro_block_size=1)
+
+            print('\n----- Saved Successfully -----\n')
+        
+        elif action == 'body' :
+            exit = results_manager.print_both_body(type_genome)
+
+        elif action == 'haploid genealogy' or action == 'genealogy' :
+            exit = results_manager.explore_both_genealogy(type_genome)
+        
+        elif action == 'render haploid genealogy' or action == 'render genealogy' :
+            exit, gen, id, genealogy = results_manager.render_both_family(type_genome)
+
+            video_dir = os.path.join(results_manager.results_dir, type_genome, 'video')
+            family_video_dir = os.path.join(video_dir, 'family', 'gen_{}_id_{}'.format(gen, id))
+            os.makedirs(family_video_dir, exist_ok=True)
+
+            for i in range(len(genealogy)) :
+                cur_gen = gen - i
+                for indi in genealogy[i] :
+                    video_mp4_path = os.path.join(family_video_dir, 'gen_{}_id_{}.mp4'.format(cur_gen, indi))
+                    # video_gif_path = os.path.join(family_video_dir, 'gen_{}_id_{}.gif'.format(cur_gen, indi))
+
+                    print('\n----- Simulating the simulation -----\n')
+
+                    name_body = '{}_body_registry'.format(cur_gen)
+                    name_controller_network = '{}_controller_network_registry'.format(cur_gen)
+                    body_registry = getattr(results_manager, name_body)
+                    controller_network_registry = getattr(results_manager, name_controller_network)
+                    body = body_registry[(cur_gen, indi)]
+                    controller_network = controller_network_registry[(cur_gen, indi)]
+                
+                    images, _ = robot_simulator.simulate_render(body.body, controller_network, network_manager, config.n_steps)
+                    
+                    io.mimwrite(video_mp4_path, images, fps=30, macro_block_size=1)
+                   
+                    print('\n----- Saved Successfully -----\n')
+        
+        elif action == 'save haploid family' or action == 'save family' :
+            exit, gen, id, genealogy = results_manager.save_both_family(type_genome)
+
+            images_dir = os.path.join(results_manager.results_dir, type_genome, 'images')
+            family_images_dir = os.path.join(images_dir, 'family, gen_{}_id_{}'.format(gen, id))
+            os.makedirs(family_images_dir, exist_ok=True)
+
+            print('\n----- Saving the Images -----\n')
+            for i in range(len(genealogy)) :
+                cur_gen = gen - i
+                for indi in genealogy[i] :
+                    image_path = os.path.join(family_images_dir, 'gen_{}_id_{}.png'.format(cur_gen, indi))
+                    # video_gif_path = os.path.join(family_images_dir, 'gen_{}_id_{}.gif'.format(cur_gen, indi))
+
+                    name_body = '{}_body_registry'.format(cur_gen)
+                    body_registry = getattr(results_manager, name_body)
+                    body = body_registry[(cur_gen, indi)]
+
+                    image = robot_simulator.simulate_render_image(body.body)
+                    io.imwrite(image_path, image)
+
+            print('\n----- Saved Successfully -----\n')
+
+        elif action == 'save individual' : 
+            exit, gen, id = results_manager.save_both_body(type_genome)
+
+            images_dir = os.path.join(results_manager.results_dir, type_genome, 'images')
+            os.makedirs(images_dir, exist_ok=True)
+
+            print('\n----- Saving the Images -----\n')
+            name_body = '{}_body_registry'.format(gen)
+            body_registry = getattr(results_manager, name_body)
+            body = body_registry[(gen, id)]
+
+            image_path = os.path.join(images_dir, 'gen_{}_id_{}.png'.format(gen, id))
+
+            image = robot_simulator.simulate_render_image(body.body)
+            io.imwrite(image_path, image)
+
+            print('\n----- Saved Successfully -----\n')
+
+        elif action == 'distance' :
+            exit = results_manager.print_both_distance(distance_tool, type_genome)
+        
+        else : 
+            exit = True 
+        
+        print('\n----- Exiting the program -----\n')
+        
+
+        
+            
+
+
+
+        
+
+
+
+
+
+
+
+

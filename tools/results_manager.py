@@ -14,6 +14,7 @@ class ResultsManager :
         self.abs_path_results = None
         self.save = None  
         self.text_dir = None 
+        self.text_done = False
 
     def add_results_path(self) : 
         save = input("Do you want to save the results of this simulation ? \n \t [y] / [n] \n \t")
@@ -132,13 +133,15 @@ class ResultsManager :
 
     def begin_both_txt_file(self, systems, type_genome) :
         txt_file_dir = os.path.join(self.abs_path_results, type_genome, 'txt', 'all_info')
-        with open(txt_file_dir, 'a') as f :
-            f.write('\nHere the different systems below are being used :\n')
-            for system in systems :
-                f.write('\t + {}\n'.format(system))
-            f.write('\n')
-            comments = input("Please indicate the desired comments for the text file report : \n")
-            f.write('Comments : {}\n\n'.format(comments))
+        if self.text_done == False :
+            with open(txt_file_dir, 'a') as f :
+                f.write('\nHere the different systems below are being used :\n')
+                for system in systems :
+                    f.write('\t + {}\n'.format(system))
+                f.write('\n')
+                comments = input("Please indicate the desired comments for the text file report : \n")
+                f.write('Comments : {}\n\n'.format(comments))
+                self.text_done = True
 
 
 
@@ -183,7 +186,7 @@ class ResultsManager :
         passed = time.time() - self.time
         result = f'\nTHIS GENERATION TOOK {passed:.3f} s.\n'
         result += '\n'
-        self._log_both(result)
+        self._log_both(result, type_genome)
        
     def start_generation(self, generation, config) :
         self.time = time.time()
@@ -285,7 +288,7 @@ class ResultsManager :
         result += 'Here all the valid individuals are considered.\n'
         result += f'Anyway the standard deviation of the fitness is {sigma:.3f}\n'
         result += '\n'
-        self._log_both(result)
+        self._log_both(result, type_genome)
         return average, sigma
 
 
@@ -323,7 +326,7 @@ class ResultsManager :
         print('\n ----- Config loaded ----- \n')
         return False 
     
-    def both_loader(self, type_genome) :
+    def both_loader(self) :
         path = input('From which folder do you want to get the results : ')
         number = input('From which experiment ID do you want to get the results : ')
         self.init_load = True 
@@ -333,16 +336,16 @@ class ResultsManager :
 
         print('\n ----- Loading the Config ----- \n')
 
-        diploid_json_dir  = os.path.join(results_dir, type_genome, 'json')
-        diploid_pkl_dir = os.path.join(results_dir, type_genome, 'pkl')
+        diploid_json_dir = os.path.join(results_dir, 'diploid', 'json')
+        haploid_json_dir = os.path.join(results_dir, 'haploid', 'json')
 
         self.diploid_json_dir = diploid_json_dir
-        self.diploid_pkl_dir = diploid_pkl_dir
-
-        haploid_json_dir  = os.path.join(results_dir, 'json')
-        haploid_pkl_dir = os.path.join(results_dir, 'pkl')
-
         self.haploid_json_dir = haploid_json_dir
+
+        diploid_pkl_dir = os.path.join(results_dir, 'diploid', 'pkl')
+        haploid_pkl_dir = os.path.join(results_dir, 'haploid', 'pkl')
+
+        self.diploid_pkl_dir = diploid_pkl_dir
         self.haploid_pkl_dir = haploid_pkl_dir
 
         json_diploid = os.path.join(diploid_json_dir, 'configs.json')
@@ -415,7 +418,7 @@ class ResultsManager :
         gen = input("Please indicate the generation of the generation of the individual you want to render : ")
         id = input("Please indicate the ID of the individual you want to render : ")
         exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
-        
+        self.pkl_dir = os.path.join(self.results_dir, type_genome, 'pkl')
         print('\n----- Loading the save ----- \n')
         dir = os.path.join(self.results_dir, type_genome, 'pkl')
         for file in os.listdir(dir) :
@@ -1103,6 +1106,17 @@ class ResultsManager :
             return True
         else : 
             return False
+        
+    def print_both_distance(self, distance_tool, type_genome) :
+        if type_genome == 'diploid' :
+            self.pkl_dir = copy.deepcopy(self.diploid_pkl_dir)
+            return self.print_distance(distance_tool)
+        elif type_genome == 'haploid' :
+            self.pkl_dir = copy.deepcopy(self.haploid_pkl_dir)
+            return self.print_distance(distance_tool)
+        else : 
+            raise Exception('The type of genome is not valid')
+        
 
         
 

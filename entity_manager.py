@@ -13,6 +13,10 @@ class EntityManager :
         self.next_id += 1
         self._alive.add(id)
         return id 
+
+    def reset(self) : 
+        self.next_id = 0 
+        self._alive = set()
     
     def destroy_entity(self, entity_id) : 
         self._alive.remove(entity_id)
