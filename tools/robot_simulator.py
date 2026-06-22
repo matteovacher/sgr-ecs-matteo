@@ -18,8 +18,20 @@ class RobotSimulator:
         env = gym.make(self.config.env_name, body = robot, connections = connections)
         return env.unwrapped 
     
+    def _get_env_mode_env(self, robot, type_env) :
+        connections = get_full_connectivity(robot)
+        env = gym.make(self.config.env_name[type_env], body = robot, connections = connections)
+        return env.unwrapped
+
     def get_observation_size(self, robot) :
         env = self._get_env(robot)
+        observation, _ = env.reset()
+        env.close()
+        del env 
+        return len(observation)
+    
+    def get_observation_size_mode_env(self, robot, type_env) :
+        env = self._get_env_mode_env(robot, type_env)
         observation, _ = env.reset()
         env.close()
         del env 
@@ -54,6 +66,35 @@ class RobotSimulator:
         env.close() 
         del env 
         return id, reward, finished 
+    
+    def simulate_mode_env(self, id, robot, controller, n_steps, controller_manager, type_env) : 
+        env = self._get_env_mode_env(robot, type_env) 
+        reward = 0  
+
+        observation, _ = env.reset()
+
+        actuators = env.get_actuator_indices("robot")
+        inputs_size = math.ceil(math.sqrt(len(observation)))
+
+        finished = False 
+
+        for _ in range (n_steps) : 
+            observation.resize(inputs_size**2)
+            all_actions = controller_manager.activate(controller, observation)
+            action = np.array([all_actions[i] for i in actuators])
+            observation, step_reward, terminated, truncated, _ = env.step(action)
+
+            reward += step_reward
+
+            done = terminated or truncated 
+
+            if done : 
+                finished = True 
+                break 
+
+        env.close() 
+        del env 
+        return id, reward, finished
 
     def _get_env_render(self, robot) : 
         print('----- Here is the simulated robot -----')

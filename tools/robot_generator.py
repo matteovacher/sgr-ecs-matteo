@@ -20,3 +20,14 @@ class RobotGenerator :
     
     def get_full_connectivity(self, robot) :
         return get_full_connectivity(robot)
+    
+    def generate_robot_body_from_network_and_env(self, body_network, network_manager, body_shape, type_env) :
+        if type_env == 0 : 
+            body_outputs = network_manager.activate(body_network, [- np.pi])
+        elif type_env == 1 : 
+            body_outputs = network_manager.activate(body_network, [np.pi])
+        else : 
+            raise Exception("type_env must be 0 or 1")
+        formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
+        robot = np.argmax(formated, 2)
+        return robot
