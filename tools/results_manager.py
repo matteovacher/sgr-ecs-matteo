@@ -411,6 +411,8 @@ class ResultsManager :
             action = self.ask_action()
         elif type_genome == 'haploid' :
             action = self.ask_haploid_action()
+        else : 
+            raise Exception('The type of genome is not valid')
         return type_genome, action
             
 

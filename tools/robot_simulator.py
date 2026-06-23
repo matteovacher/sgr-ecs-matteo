@@ -169,7 +169,7 @@ class RobotSimulator:
         return images, fitness 
     
     def simulate_render_image_mode_env(self, robot, type_env) :
-        env = self._get_env_render(robot, type_env)
+        env = self._get_env_render_mode_env(robot, type_env)
         _, _ = env.reset()
         robot_image = env.render()
         env.close()

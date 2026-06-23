@@ -48,6 +48,13 @@ class DistanceTool :
             distance_vel_ori += np.linalg.norm(velocity_orientations1[i] - velocity_orientations2[i])
         return distance_pos, distance_vel, distance_vel_ori
     
+
+    def _same_activation(self, f1, f2) :
+        samples = np.linspace(-5, 5, 10)
+        out1 = np.round([f1(x) for x in samples], 2)
+        out2 = np.round([f2(x) for x in samples], 2)
+        return np.array_equal(out1, out2)
+
     def distance_expressed_genome(self, node_evals1, node_evals2) :
         act_functions_distance = 0 
         weight_distance = 0 
@@ -71,7 +78,7 @@ class DistanceTool :
             count_bias += 1
 
             bias_distance += np.linalg.norm(np.array(bias1) - np.array(bias2))
-            act_functions_distance += 0 if activation_function1 is activation_function2 else 1
+            act_functions_distance += 0 if self._same_activation(activation_function1, activation_function2) else 1
 
 
         number_of_nodes = sum(self.config.shape_of_cppn[1:])
