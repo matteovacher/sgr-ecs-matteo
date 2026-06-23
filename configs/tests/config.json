@@ -5,10 +5,10 @@
     "max_bias" : 20,
     "response" : 1, 
 
-    "range_weight" : 11, 
-    "range_bias" : 11,
-    "sigma_weight" : 0.5, 
-    "sigma_bias" : 0.5, 
+    "range_weight" : 3, 
+    "range_bias" : 3,
+    "sigma_weight" : 0.015, 
+    "sigma_bias" : 0.015, 
     "threshold_weight" : 0.1, 
     "threshold_bias" : 0.1, 
     "threshold_function" : 0.1,
@@ -16,21 +16,21 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 3, 
+    "generations" : 30, 
     "population" : 100, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 5, 
+    "number_in_tournament" : 4, 
     "number_of_elites" : 2, 
 
-    "shape_of_cppn" : [10, 4, 4, 2, 1],
+    "shape_of_cppn" : [10, 4, 4, 4, 1],
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
     "n_steps" : 800, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 6, 
+    "cpus" : 20, 
 
-    "env_name" : "Walker-v0"
+    "env_name" : "ObstacleTraverser-v1"
 
 }

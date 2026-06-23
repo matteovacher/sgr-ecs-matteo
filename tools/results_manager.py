@@ -153,6 +153,10 @@ class ResultsManager :
             f.write('\n')
             f.write('Comments : {}\n\n'.format(self.comments))
 
+    def add_exp_name(self, exp_name, type_genome) :
+        txt_file_dir = os.path.join(self.abs_path_results, type_genome, 'txt', 'all_info')
+        with open(txt_file_dir, 'a') as f :
+            f.write('\nExperiment name : {}\n\n'.format(exp_name))
 
 
     def _log(self, result):

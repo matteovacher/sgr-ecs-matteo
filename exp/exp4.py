@@ -77,6 +77,8 @@ def main() :
     world.add_end_system(save_system)
     
     results_manager.begin_both_txt_file(world.all_systems, type_genome)
+    exp_name = __name__
+    results_manager.add_exp_name(exp_name, type_genome)
 
     world.build()
     for generation in range(config.generations) :
@@ -114,6 +116,8 @@ def main() :
     world.add_end_system(save_system)
 
     results_manager.begin_both_txt_file(world.all_systems, type_genome)
+    exp_name = __name__
+    results_manager.add_exp_name(exp_name, type_genome)
 
     world.build()
     for generation in range(config.generations) :
@@ -184,7 +188,7 @@ def render() :
             controller_network_registry = getattr(results_manager, name_controller_network)
             body = body_registry[key]
             controller_network = controller_network_registry[key]
-            print(config)
+            # print(config)
 
             images, _ = robot_simulator.simulate_render(body.body, controller_network, network_manager, config.n_steps)
 

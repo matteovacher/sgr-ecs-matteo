@@ -80,6 +80,8 @@ def main() :
 
         if gen == 1 : 
             results_manager.begin_both_env_txt_file(world.all_systems, type_genome, gen)
+            exp_name = __name__
+            results_manager.add_exp_name(exp_name, type_genome)
             world.build()
         
         world.step()
@@ -123,6 +125,8 @@ def main() :
 
         if gen == 1 : 
             results_manager.begin_both_env_txt_file(world.all_systems, type_genome, gen)
+            exp_name = __name__
+            results_manager.add_exp_name(exp_name, type_genome)
             world.build()
         
         world.step()
