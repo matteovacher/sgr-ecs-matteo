@@ -14,7 +14,7 @@ class ResultsManager :
         self.abs_path_results = None
         self.save = None  
         self.text_dir = None 
-        self.text_done = False
+        self.comments = None
 
     def add_results_path(self) : 
         save = input("Do you want to save the results of this simulation ? \n \t [y] / [n] \n \t")
@@ -133,15 +133,25 @@ class ResultsManager :
 
     def begin_both_txt_file(self, systems, type_genome) :
         txt_file_dir = os.path.join(self.abs_path_results, type_genome, 'txt', 'all_info')
-        if self.text_done == False :
-            with open(txt_file_dir, 'a') as f :
-                f.write('\nHere the different systems below are being used :\n')
-                for system in systems :
-                    f.write('\t + {}\n'.format(system))
-                f.write('\n')
-                comments = input("Please indicate the desired comments for the text file report : \n")
-                f.write('Comments : {}\n\n'.format(comments))
-                self.text_done = True
+        if self.comments is None :
+            self.comments = input("Please indicate the desired comments for the text file report : \n")
+        with open(txt_file_dir, 'a') as f :
+            f.write('\nHere the different systems below are being used :\n')
+            for system in systems :
+                f.write('\t + {}\n'.format(system))
+            f.write('\n')
+            f.write('Comments : {}\n\n'.format(self.comments))
+    
+    def begin_both_env_txt_file(self, systems, type_genome, gen) :
+        txt_file_dir = os.path.join(self.abs_path_results, type_genome, 'txt', 'all_info')
+        if self.comments is None and gen == 1 :
+            self.comments = input("Please indicate the desired comments for the text file report : \n")
+        with open(txt_file_dir, 'a') as f :
+            f.write('\nHere the different systems below are being used :\n')
+            for system in systems :
+                f.write('\t + {}\n'.format(system))
+            f.write('\n')
+            f.write('Comments : {}\n\n'.format(self.comments))
 
 
 
@@ -189,6 +199,7 @@ class ResultsManager :
         self._log_both(result, type_genome)
        
     def start_generation(self, generation, config) :
+        
         self.time = time.time()
         result = f'----- Starting generation number {generation} out of {config.generations} -----\n'
         result += '\n'
@@ -197,6 +208,15 @@ class ResultsManager :
     def start_both_generation(self, generation, config, type_genome) :
         self.time = time.time()
         result = f'----- Starting generation number {generation} out of {config.generations} -----\n'
+        result += '----- Genome : {} -----\n'.format(type_genome)
+        result += '\n'
+        self._log_both(result, type_genome)
+
+    def start_both_env_generation(self, generation, config, type_genome, type_env) :
+        self.time = time.time()
+        result = f'----- Starting generation number {generation} out of {config.generations} -----\n'
+        result += '----- Genome : {} -----\n'.format(type_genome)
+        result += f'----- Environment : {config.env_name[type_env]} -----\n'
         result += '\n'
         self._log_both(result, type_genome)
        

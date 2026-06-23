@@ -97,9 +97,15 @@ class RobotSimulator:
         return id, reward, finished
 
     def _get_env_render(self, robot) : 
-        print('----- Here is the simulated robot -----')
+        print('----- Here is the simulated robot -----\n')
         connections = get_full_connectivity(robot)
         env = gym.make(self.config.env_name, body=robot, connections=connections, render_mode="rgb_array")
+        return env.unwrapped
+    
+    def _get_env_render_mode_env(self, robot, type_env) : 
+        print('----- Here is the simulated robot -----\n')
+        connections = get_full_connectivity(robot)
+        env = gym.make(self.config.env_name[type_env], body=robot, connections=connections, render_mode="rgb_array")
         return env.unwrapped
     
     def simulate_render(self, robot, controller, controller_manager, n_steps) : 
@@ -132,8 +138,38 @@ class RobotSimulator:
         print('----- End of simulation -----\n')
         return images, fitness 
     
-    def simulate_render_image(self, robot) :
-        env = self._get_env_render(robot)
+    def simulate_render_mode_env(self, robot, controller, controller_manager, n_steps, type_env) : 
+        env = self._get_env_render_mode_env(robot, type_env)
+        fitness = 0
+        observation, _ = env.reset()
+
+        actuators = env.get_actuator_indices("robot")
+        inputs_size = math.ceil(math.sqrt(len(observation)))
+
+        images = []
+
+        for _ in range (n_steps) : 
+
+            images.append(env.render())
+
+            observation.resize(inputs_size**2)
+            all_actions = controller_manager.activate(controller, observation)
+            action = np.array([all_actions[i] for i in actuators])
+            observation, reward, terminated, truncated, _ = env.step(action)
+
+            done = terminated or truncated 
+            fitness += reward
+            if done : 
+                break 
+
+        env.close()
+        del env 
+        print(f'Individual fitness : {fitness}\n')
+        print('----- End of simulation -----\n')
+        return images, fitness 
+    
+    def simulate_render_image_mode_env(self, robot, type_env) :
+        env = self._get_env_render(robot, type_env)
         _, _ = env.reset()
         robot_image = env.render()
         env.close()

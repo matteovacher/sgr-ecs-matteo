@@ -16,7 +16,7 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 4, 
+    "generations" : 5, 
     "switch" : 2, 
     "population" : 100, 
     "number_of_winner" : 1, 

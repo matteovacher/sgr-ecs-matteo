@@ -105,6 +105,7 @@ def main() :
     save_system = BothSaveSystem(config, results_manager, type_genome)
 
     world.add_builder_system(build_system)
+    
     world.add_step_system(phenotype_system)
     world.add_step_system(evaluation_system)
     world.add_step_system(save_gen_system)

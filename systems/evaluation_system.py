@@ -109,6 +109,7 @@ class HaploidEvaluationSystem :
         n_steps_list = [self.config.n_steps for _ in range(len(entity_ids))]
         network_manager_list = [self.network_manager for _ in range(len(entity_ids))]
         function = self.robot_simulator.simulate
+        
 
         chunk = list(zip(entity_ids, bodies, controllers, n_steps_list, network_manager_list))
         results = self.parallel_tool.run(function, chunk)
@@ -313,8 +314,9 @@ class BothEnvEvaluationSystem() :
             n_steps_list = [self.config.n_steps for _ in range(len(entity_ids))]
             network_manager_list = [self.network_manager for _ in range(len(entity_ids))]
             function = self.robot_simulator.simulate_mode_env
+            type_envs = [self.type_env for _ in range(len(entity_ids))]
 
-            chunk = list(zip(entity_ids, bodies, controllers, n_steps_list, network_manager_list))
+            chunk = list(zip(entity_ids, bodies, controllers, n_steps_list, network_manager_list, type_envs))
             results = self.parallel_tool.run(function, chunk)
 
             tosave = True
@@ -369,8 +371,9 @@ class BothEnvEvaluationSystem() :
             n_steps_list = [self.config.n_steps for _ in range(len(entity_ids))]
             network_manager_list = [self.network_manager for _ in range(len(entity_ids))]
             function = self.robot_simulator.simulate_mode_env
+            type_envs = [self.type_env for _ in range(len(entity_ids))]
 
-            chunk = list(zip(entity_ids, bodies, controllers, n_steps_list, network_manager_list))
+            chunk = list(zip(entity_ids, bodies, controllers, n_steps_list, network_manager_list, type_envs))
             results = self.parallel_tool.run(function, chunk)
 
             tosave = True

@@ -15,6 +15,12 @@ class World :
         self._step_systems.clear()
         self._end_systems.clear()
         self.all_systems.clear()
+    
+    def clean_step_systems(self) : 
+        self._step_systems.clear() 
+        for system in self.all_systems : 
+            if system not in self._builder_systems and system not in self._end_systems : 
+                self.all_systems.remove(system)
 
     def add_builder_system(self, system) : 
         self._builder_systems.append(system)
