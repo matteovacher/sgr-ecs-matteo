@@ -5,10 +5,10 @@
     "max_bias" : 20,
     "response" : 1, 
 
-    "range_weight" : 3, 
-    "range_bias" : 3,
-    "sigma_weight" : 0.015, 
-    "sigma_bias" : 0.015, 
+    "range_weight" : 4, 
+    "range_bias" : 4, 
+    "sigma_weight" : 0.025, 
+    "sigma_bias" : 0.025, 
     "threshold_weight" : 0.1, 
     "threshold_bias" : 0.1, 
     "threshold_function" : 0.1,
@@ -16,13 +16,13 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 30, 
+    "generations" : 40, 
     "population" : 100, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 4, 
     "number_of_elites" : 2, 
 
-    "shape_of_cppn" : [10, 4, 4, 4, 1],
+    "shape_of_cppn" : [10, 5, 5, 5, 1], 
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
