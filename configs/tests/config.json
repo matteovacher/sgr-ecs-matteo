@@ -10,8 +10,8 @@
     
     "range_weight" : 4, 
     "range_bias" : 4, 
-    "sigma_weight" : 0.2, 
-    "sigma_bias" : 0.2, 
+    "sigma_weight" : 0.5, 
+    "sigma_bias" : 0.5, 
     "threshold_weight" : 0.1, 
     "threshold_bias" : 0.1, 
     "threshold_function" : 0.1,
