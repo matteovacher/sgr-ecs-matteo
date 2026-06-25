@@ -23,15 +23,13 @@ from tools.distance import DistanceTool
 
 
 from systems.build_system import BothBuildSystem
-from systems.phenotype_system import BothCoPhenotypeSystem
+from systems.phenotype_system import BothCo2WiBiPhenotypeSystem
 from systems.evaluation_system import BothEvaluationSystem
 from systems.save_gen_system import BothSaveGenSystem
 from systems.reproduction_system import BothCoReproductionSystem
 from systems.save_system import BothSaveSystem
 
-
-# with co dominance and former json, aim is to have more diversity for haploidy since diploidy already explore more space 
-
+# here i test the new shape of cppn with less complexity, maybe will explore more instead of focusing on one type of solution 
 
 def main() : 
     # first exp with diploidy 
@@ -65,7 +63,7 @@ def main() :
     genome_operator = GenomeOperator(config)
 
     build_system = BothBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
-    phenotype_system = BothCoPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
+    phenotype_system = BothCo2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
     evaluation_system = BothEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome)
     save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
     reproduction_system = BothCoReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
@@ -104,7 +102,7 @@ def main() :
     genome_operator = HaploidOperator(config)
 
     build_system = BothBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
-    phenotype_system = BothCoPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
+    phenotype_system = BothCo2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
     evaluation_system = BothEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome)
     save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
     reproduction_system = BothCoReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)

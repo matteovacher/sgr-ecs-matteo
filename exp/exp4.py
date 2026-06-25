@@ -29,6 +29,8 @@ from systems.save_gen_system import BothSaveGenSystem
 from systems.reproduction_system import BothReproductionSystem
 from systems.save_system import BothSaveSystem
 
+# only diploid and haploid 
+
 def main() : 
     # first exp with diploidy 
 

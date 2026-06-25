@@ -27,6 +27,8 @@ from systems.save_gen_system import BothSaveGenSystem
 from systems.reproduction_system import BothReproductionSystem
 from systems.save_system import BothSaveSystem
 
+# Here 2 env and haploid and diploid 
+
 def main() :
     entity_manager = EntityManager()
     world = World()

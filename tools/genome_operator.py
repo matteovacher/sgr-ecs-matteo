@@ -171,11 +171,15 @@ class GenomeOperator:
             for connection in connections :
                 if np.random.uniform() < threshold_weight :
                     connections[connection] += np.random.normal(loc = 0, scale = sigma_weight)
+                    if abs(connections[connection]) > self.config.max_weight_cppn : 
+                        connections[connection] = np.sign(connections[connection]) * self.config.max_weight_cppn 
                     # print('happened w')
         for biases in genome.biases :
             for node in biases :
                 if np.random.uniform() < threshold_bias :
                     biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
+                    if abs(biases[node]) > self.config.max_bias_cppn :
+                        biases[node] = np.sign(biases[node]) * self.config.max_bias_cppn
                     # print('happened b')
         list_of_keys = list(functions_pool.keys())
         for functions in genome.functions :
@@ -345,10 +349,14 @@ class HaploidOperator :
         for node in genome.connections :
             if np.random.uniform() < threshold_weight  :
                 genome.connections[node] += np.random.normal(loc = 0, scale = sigma_weight )
+                if abs(genome.connections[node]) > self.config.max_weight_cppn :
+                    genome.connections[node] = np.sign(genome.connections[node]) * self.config.max_weight_cppn
     
         for node in genome.biases :
             if np.random.uniform() < threshold_bias :
                 genome.biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
+                if abs(genome.biases[node]) > self.config.max_bias_cppn :
+                    genome.biases[node] = np.sign(genome.biases[node]) * self.config.max_bias_cppn
 
         list_of_keys = list(functions_pool.keys())
         for node in genome.functions :
