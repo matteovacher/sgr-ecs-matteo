@@ -29,7 +29,7 @@ from systems.save_gen_system import BothSaveGenSystem
 from systems.reproduction_system import BothCoReproductionSystem
 from systems.save_system import BothSaveSystem
 
-# here i test the new shape of cppn with less complexity, maybe will explore more instead of focusing on one type of solution 
+# here i test the new shape of cppn with less complexity, maybe will explore more instead of focusing on one type of solution, without bias query and with 2 outputs and co dominance 
 
 def main() : 
     # first exp with diploidy 

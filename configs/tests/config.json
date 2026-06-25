@@ -7,6 +7,7 @@
 
     "max_weight_cppn" : 20,
     "max_bias_cppn" : 20,
+    
     "range_weight" : 4, 
     "range_bias" : 4, 
     "sigma_weight" : 0.2, 
@@ -21,17 +22,17 @@
     "generations" : 40, 
     "population" : 100, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 4, 
+    "number_in_tournament" : 5, 
     "number_of_elites" : 2, 
 
     "shape_of_cppn" : [10, 10, 10, 10, 2], 
 
-    "function_pool" : ["gaussian", "sin", "tanh"], 
+    "function_pool" : ["gaussian", "sin", "tanh", "minus gaussian"], 
 
     "n_steps" : 800, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 20, 
+    "cpus" : 25, 
 
     "env_name" : "ObstacleTraverser-v1"
 
