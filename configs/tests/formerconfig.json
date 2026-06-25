@@ -5,8 +5,10 @@
         5,
         5
     ],
-    "max_weight": 20,
-    "max_bias": 20,
+    "max_weight": 3,
+    "max_bias": 3,
+    "max_weight_cppn": 20,
+    "max_bias_cppn": 20,
     "response": 1,
     "range_weight": 3,
     "range_bias": 3,
