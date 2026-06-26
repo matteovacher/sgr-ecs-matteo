@@ -1,4 +1,4 @@
-
+import numpy as np
 
 
 class PhenotypeBuilder :
@@ -23,11 +23,27 @@ class PhenotypeBuilder :
         else :
             return 0.0
         
+    def _distance(self, coordinate1, coordinate2) :
+        array1 = np.array(coordinate1)
+        array2 = np.array(coordinate2)
+        return np.linalg.norm(array1 - array2)
+
+
     def _query_cppn_weight_2_outputs(self, cppn, network_manager, coordinate1, coordinate2, one_towards_two, max_weight, type_output) :
+
+        distance = self._distance(coordinate1, coordinate2)
+
+        distance = [x for x in distance]
+
         if one_towards_two :
-            inputs = [*coordinate1, *coordinate2]
+            inputs = [*coordinate1, *coordinate2, *distance]
         else :
-            inputs = [*coordinate2, *coordinate1]
+            inputs = [*coordinate2, *coordinate1, *distance]
+
+        # if one_towards_two :
+        #     inputs = [*coordinate1, *coordinate2]
+        # else :
+        #     inputs = [*coordinate2, *coordinate1]
 
         output = network_manager.activate(cppn, inputs)
 

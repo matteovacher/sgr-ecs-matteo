@@ -124,10 +124,11 @@ class GenomeOperator:
                 else :
                     choice = np.random.randint(0, 2)
                     bias[node] = (genome.biases[0][node] + genome.biases[1][node]) / 2
+                    genome.biases[choice][node] = copy.deepcopy(bias[node])
                     functions[node] = genome.functions[choice][node]
                     for previous_node in previous_layer :
                         connections[(previous_node, node)] = (genome.connections[0][(previous_node, node)] + genome.connections[1][(previous_node, node)]) / 2
-
+                        genome.connections[choice][(previous_node, node)] = copy.deepcopy(connections[(previous_node, node)])
             previous_layer = genome.nodes[index_of_layer]
 
         return connections, bias, functions
