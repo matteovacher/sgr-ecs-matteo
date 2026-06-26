@@ -91,11 +91,11 @@ class SubstrateBuilder:
                 for x in layer[1:len(layer)-2] :
                     interval_one_dimension = np.linspace(-1.0, 1, x) if (x>1) else [0.0]
                     interval_array.append(interval_one_dimension)
-                if layer[-2] == layer[-1] :
+                if layer[-2] == layer[-1] and layer[-1] != 1:
                     
                     number_of_points = layer[-1]
                     angle = 2*np.pi/number_of_points
-                    radius = 1.0/number_of_layer
+                    radius = 1.0
                     last_coords = []
                     for i in range(number_of_points) :
                         last_coords.append([radius*np.cos(angle*i), radius*np.sin(angle*i)])
@@ -118,7 +118,7 @@ class SubstrateBuilder:
                     
                     number_of_points = layer[-1]
                     angle = 2*np.pi/number_of_points
-                    radius = 1.0/number_of_layer
+                    radius = 1.0
                     last_coords = []
                     for i in range(number_of_points) :
                         last_coords.append([radius*np.cos(angle*i), radius*np.sin(angle*i)])
@@ -150,9 +150,14 @@ class SubstrateBuilder:
         body_shape = config.body_shape
         shape_of_substrate = [
             [1, 1, 1, 1, 1], 
-            [2, body_shape[0], body_shape[1], 5, 5], # the last 2 dim must be the same if you want to implement a circle 
+            [2, body_shape[0], body_shape[1], 1, 1], # the last 2 dim must be the same if you want to implement a circle 
             [3, body_shape[0], body_shape[1], 5, 5]
         ]
+        # shape_of_substrate = [
+        #     [1, 1, 1, 1, 1], 
+        #     [2, body_shape[0], body_shape[1], 5, 5], # the last 2 dim must be the same if you want to implement a circle 
+        #     [3, body_shape[0], body_shape[1], 5, 5]
+        # ]
         return shape_of_substrate 
     
     def extract_body_network_shape_test(self, config):
@@ -168,10 +173,15 @@ class SubstrateBuilder:
     def extract_controller_network_shape(self, grid_input_size, config) :
         body_shape = config.body_shape
         controller_shape = [
-            [-1, grid_input_size, grid_input_size, 1, 1], 
-            [-2, body_shape[0], body_shape[1], 5, 5], # here the last two dim are the same because i want a circle, the main objective here is that 
-            [-3, body_shape[0], body_shape[1], 1, 1] # i want the cppn to detect which connection to reinforce 
+            [-1, grid_input_size, grid_input_size, 1, 1],
+            [-2, body_shape[0], body_shape[1], 1, 1], 
+            [-3, body_shape[0], body_shape[1], 1, 1]
         ]
+        # controller_shape = [
+        #     [-1, grid_input_size, grid_input_size, 1, 1], 
+        #     [-2, body_shape[0], body_shape[1], 5, 5], # here the last two dim are the same because i want a circle, the main objective here is that 
+        #     [-3, body_shape[0], body_shape[1], 1, 1] # i want the cppn to detect which connection to reinforce 
+        # ]
         return controller_shape
 
 
