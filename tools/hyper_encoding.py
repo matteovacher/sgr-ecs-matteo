@@ -33,12 +33,10 @@ class PhenotypeBuilder :
 
         distance = self._distance(coordinate1, coordinate2)
 
-        distance = [x for x in distance]
-
         if one_towards_two :
-            inputs = [*coordinate1, *coordinate2, *distance]
+            inputs = [*coordinate1, *coordinate2, distance]
         else :
-            inputs = [*coordinate2, *coordinate1, *distance]
+            inputs = [*coordinate2, *coordinate1, distance]
 
         # if one_towards_two :
         #     inputs = [*coordinate1, *coordinate2]
