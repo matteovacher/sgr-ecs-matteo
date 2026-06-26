@@ -45,8 +45,8 @@ class GenomeOperator:
                     weight2 = self.config.range_weight * np.random.uniform(-1, 1)
                     connections1[(previous_node, node)] = weight1
                     connections2[(previous_node, node)] = weight2
-                d1 = np.random.randint(0, self.config.number_of_dominances + 1)
-                d2 = np.random.randint(0, self.config.number_of_dominances + 1)
+                d1 = np.random.randint(1, self.config.number_of_dominances + 1)
+                d2 = np.random.randint(1, self.config.number_of_dominances + 1)
                 b1 = self.config.range_bias * np.random.uniform(-1, 1)
                 b2 = self.config.range_bias * np.random.uniform(-1, 1)
                 c1 = np.random.randint(0, len(list_of_keys)) 
@@ -197,9 +197,9 @@ class GenomeOperator:
         for dominances in genome.dominances :
             for node in dominances :
                 if np.random.uniform() < threshold_dominance :
-                    choice = np.random.randint(0, self.config.number_of_dominances + 1)
+                    choice = np.random.randint(1, self.config.number_of_dominances + 1)
                     while dominances[node] == choice :
-                        choice = np.random.randint(0, self.config.number_of_dominances + 1)
+                        choice = np.random.randint(1, self.config.number_of_dominances + 1)
                     dominances[node] = choice
                     # print('happened d')
         
@@ -242,7 +242,7 @@ class HaploidOperator :
                 for previous_node in previous_layer :
                     weight = self.config.range_weight * np.random.uniform(-1, 1)
                     connections[(previous_node, node)] = weight
-                d = np.random.randint(0, self.config.number_of_dominances + 1)
+                d = np.random.randint(1, self.config.number_of_dominances + 1)
                 b = self.config.range_bias * np.random.uniform(-1, 1)
                 c = np.random.randint(0, len(list_of_keys)) 
                 act_function = functions_pool[list_of_keys[c]]
@@ -372,9 +372,9 @@ class HaploidOperator :
 
         for node in genome.dominances :
             if np.random.uniform() < threshold_dominance :
-                choice = np.random.randint(0, self.config.number_of_dominances + 1)                     
+                choice = np.random.randint(1, self.config.number_of_dominances + 1)                     
                 while genome.dominances[node] == choice :
-                    choice = np.random.randint(0, self.config.number_of_dominances + 1)
+                    choice = np.random.randint(1, self.config.number_of_dominances + 1)
                 genome.dominances[node] = choice 
 
         return genome 

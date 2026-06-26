@@ -172,16 +172,16 @@ class SubstrateBuilder:
         
     def extract_controller_network_shape(self, grid_input_size, config) :
         body_shape = config.body_shape
-        controller_shape = [
-            [-1, grid_input_size, grid_input_size, 1, 1],
-            [-2, body_shape[0], body_shape[1], 1, 1], 
-            [-3, body_shape[0], body_shape[1], 1, 1]
-        ]
         # controller_shape = [
-        #     [-1, grid_input_size, grid_input_size, 1, 1], 
-        #     [-2, body_shape[0], body_shape[1], 5, 5], # here the last two dim are the same because i want a circle, the main objective here is that 
-        #     [-3, body_shape[0], body_shape[1], 1, 1] # i want the cppn to detect which connection to reinforce 
+        #     [-1, grid_input_size, grid_input_size, 1, 1],
+        #     [-2, body_shape[0], body_shape[1], 1, 1], 
+        #     [-3, body_shape[0], body_shape[1], 1, 1]
         # ]
+        controller_shape = [
+            [-1, grid_input_size, grid_input_size, 1, 1], 
+            [-2, body_shape[0], body_shape[1], 5, 5], # here the last two dim are the same because i want a circle, the main objective here is that 
+            [-3, body_shape[0], body_shape[1], 1, 1] # i want the cppn to detect which connection to reinforce 
+        ]
         return controller_shape
 
 
