@@ -1113,21 +1113,72 @@ class ResultsManager :
         cppn_registry2 = getattr(self, name_cppn2)
         node_evals1 = cppn_registry1[(generation1, id1)].node_evals
         node_evals2 = cppn_registry2[(generation2, id2)].node_evals
+        
+        file1 = '{}_controller_network_registry.pkl'.format(generation1)
+        file_dir = os.path.join(self.pkl_dir, file1)
+        with open (file_dir, 'rb') as f :
+            if file1.endswith('.pkl') :
+                file1 = file1.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file1, loaded_object)
+
+        file2 = '{}_controller_network_registry.pkl'.format(generation2)
+        file_dir = os.path.join(self.pkl_dir, file2)
+        with open (file_dir, 'rb') as f :
+            if file2.endswith('.pkl') :
+                file2 = file2.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file2, loaded_object)
+
+        name_controller1 = '{}_controller_network_registry'.format(generation1)
+        name_controller2 = '{}_controller_network_registry'.format(generation2)
+        controller_network_registry1 = getattr(self, name_controller1)
+        controller_network_registry2 = getattr(self, name_controller2)
+        controller_node_evals1 = controller_network_registry1[(generation1, id1)].node_evals
+        controller_node_evals2 = controller_network_registry2[(generation2, id2)].node_evals
+        
 
         act_function_distance, weight_distance, bias_distance, normalized_act_function_distance, normalized_weight_distance, normalized_bias_distance = distance_tool.distance_expressed_genome(node_evals1, node_evals2)
         distance, distance_normalized = distance_tool.phenotypic_body_distance(body1, body2)
+        controller_distance, normalized_controller_distance = distance_tool.phenotypic_controller_distance(controller_node_evals1, controller_node_evals2)
         print('\n ----- Save loaded ----- \n')
         print('The body of the individual {} of generation {} is : \n{} \nAnd the body of the individual {} of generation {} is : \n{} \n'.format(id1, generation1, body1, id2, generation2, body2))
         print('The phenotypic body distance between the individual {} of generation {} and the individual {} of generation {} is : \n{} \nAnd the normalized distance is : \n{} \nAnd the compatibility is : \n{}% \n'.format(id1, generation1, id2, generation2, distance, distance_normalized, 100 * (1 - distance_normalized)))
         print('The distance between the activation functions of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, act_function_distance))
         print('The distance between the weights of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, weight_distance))
         print('The distance between the biases of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, bias_distance))
+        print('The distance between the two controllers of the individual {} of generation {} and the individual {} of generation {} is : \n{}'.format(id1, generation1, id2, generation2, controller_distance))
         print('The normalized distance between the activation functions of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, normalized_act_function_distance))
         print('The normalized distance between the weights of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, normalized_weight_distance))
         print('The normalized distance between the biases of the CPPNs of the individual {} of generation {} and the individual {} of generation {} is : \n{} \n'.format(id1, generation1, id2, generation2, normalized_bias_distance))
+        print('The normalized distance between the two controllers of the individual {} of generation {} and the individual {} of generation {} is : \n{}'.format(id1, generation1, id2, generation2, normalized_controller_distance))
         print('\nPlease note that here, a normalized distance of 1 means that twice the parameter_range is between the two considered genome. For example for a weight range of 5, a normalized distance of 1 means that the two genome are separated by a distance of 20')
-        
 
+        file1 = '{}_controller_network_registry.pkl'.format(generation1)
+        file_dir = os.path.join(self.pkl_dir, file1)
+        with open (file_dir, 'rb') as f :
+            if file1.endswith('.pkl') :
+                file1 = file1.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file1, loaded_object)
+
+        file2 = '{}_controller_network_registry.pkl'.format(generation2)
+        file_dir = os.path.join(self.pkl_dir, file2)
+        with open (file_dir, 'rb') as f :
+            if file2.endswith('.pkl') :
+                file2 = file2.removesuffix('.pkl')
+            loaded_object = dill.load(f)
+            self.__setattr__(file2, loaded_object)
+
+        name_controller1 = '{}_controller_network_registry'.format(generation1)
+        name_controller2 = '{}_controller_network_registry'.format(generation2)
+        controller_network_registry1 = getattr(self, name_controller1)
+        controller_network_registry2 = getattr(self, name_controller2)
+        controller_node_evals1 = controller_network_registry1[(generation1, id1)].node_evals
+        controller_node_evals2 = controller_network_registry2[(generation2, id2)].node_evals
+
+        controller_distance, normalized_controller_distance = distance_tool.phenotypic_controller_distance(controller_node_evals1, controller_node_evals2)
+        
         if exit == "y" :
             return True
         else : 

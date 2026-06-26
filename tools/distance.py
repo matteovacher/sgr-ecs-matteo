@@ -19,6 +19,36 @@ class DistanceTool :
                     diff = 0.5 
                 distance += diff 
         return distance, distance/(len(body1)*len(body1[0]))
+    
+    def phenotypic_controller_distance(self, node_evals1, node_evals2) : 
+        weight_distance = 0 
+        
+
+        count_weight = 0 
+        
+
+
+
+        for node_eval1, node_eval2 in zip(node_evals1, node_evals2) :
+            node1, activation_function1, agregation_function1, bias1, response1, inputs_of_node1 = node_eval1
+            node2, activation_function2, agregation_function2, bias2, response2, inputs_of_node2 = node_eval2
+            list_of_weight1 = [weight for previous_node, weight in inputs_of_node1]
+            list_of_weight2 = [weight for previous_node, weight in inputs_of_node2]
+            
+            for weight1, weight2 in zip(list_of_weight1, list_of_weight2) :
+                weight_distance += np.linalg.norm(np.array(weight1) - np.array(weight2))
+
+            count_weight += len(list_of_weight1)
+           
+           
+
+        number_of_nodes = sum(self.config.shape_of_cppn[1:])
+
+        normalized_weight_distance = weight_distance / (count_weight * 2 * self.config.max_weight)
+   
+
+    
+        return weight_distance, normalized_weight_distance, 
 
     def gravity_center_pos(self, positions) :
         mean = positions.mean(axis = 0)
