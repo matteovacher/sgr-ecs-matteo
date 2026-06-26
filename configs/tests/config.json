@@ -1,8 +1,8 @@
 
 {
     "body_shape" : [5, 5], 
-    "max_weight" : 1, 
-    "max_bias" : 1,
+    "max_weight" : 2, 
+    "max_bias" : 2,
     "response" : 1, 
 
     "max_weight_cppn" : 20,
@@ -10,8 +10,8 @@
     
     "range_weight" : 4, 
     "range_bias" : 4, 
-    "sigma_weight" : 0.5, 
-    "sigma_bias" : 0.5, 
+    "sigma_weight" : 0.2, 
+    "sigma_bias" : 0.2, 
     "threshold_weight" : 0.1, 
     "threshold_bias" : 0.1, 
     "threshold_function" : 0.1,
@@ -25,14 +25,14 @@
     "number_in_tournament" : 5, 
     "number_of_elites" : 2, 
 
-    "shape_of_cppn" : [10, 10, 10, 10, 2], 
+    "shape_of_cppn" : [10, 4, 4, 4, 2], 
 
-    "function_pool" : ["gaussian", "sin", "tanh", "minus gaussian"], 
+    "function_pool" : ["gaussian", "sin", "tanh"], 
 
     "n_steps" : 800, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 25, 
+    "cpus" : 30, 
 
     "env_name" : "ObstacleTraverser-v1"
 
