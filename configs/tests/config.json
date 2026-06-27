@@ -32,7 +32,7 @@
     "n_steps" : 800, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 30, 
+    "cpus" : 16, 
 
     "env_name" : "ObstacleTraverser-v1"
 
