@@ -95,7 +95,7 @@ class SubstrateBuilder:
                     
                     number_of_points = layer[-1]
                     angle = 2*np.pi/number_of_points
-                    radius = 1.0
+                    radius = 1.0/2
                     last_coords = []
                     for i in range(number_of_points) :
                         last_coords.append([radius*np.cos(angle*i), radius*np.sin(angle*i)])
@@ -118,7 +118,7 @@ class SubstrateBuilder:
                     
                     number_of_points = layer[-1]
                     angle = 2*np.pi/number_of_points
-                    radius = 1.0
+                    radius = 1.0/2
                     last_coords = []
                     for i in range(number_of_points) :
                         last_coords.append([radius*np.cos(angle*i), radius*np.sin(angle*i)])
