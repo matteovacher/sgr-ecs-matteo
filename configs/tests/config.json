@@ -8,18 +8,18 @@
     "max_weight_cppn" : 20,
     "max_bias_cppn" : 20,
     
-    "range_weight" : 4, 
-    "range_bias" : 4, 
-    "sigma_weight" : 0.3, 
+    "range_weight" : 2, 
+    "range_bias" : 2, 
+    "sigma_weight" : 0.4, 
     "sigma_bias" : 0.3, 
-    "threshold_weight" : 0.5, 
-    "threshold_bias" : 0.5, 
+    "threshold_weight" : 0.8, 
+    "threshold_bias" : 0.15, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
 
     "number_of_dominances" : 5, 
 
-    "generations" : 80, 
+    "generations" : 50, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 5, 
@@ -34,6 +34,6 @@
 
     "cpus" : 30, 
 
-    "env_name" : "CaveCrawler-v0"
+    "env_name" : "ObstacleTraverser-v1"
 
 }
