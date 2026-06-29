@@ -12,7 +12,7 @@
     "range_bias" : 2, 
     "sigma_weight" : 0.3, 
     "sigma_bias" : 0.3, 
-    "threshold_weight" : 0.5, 
+    "threshold_weight" : 0.7, 
     "threshold_bias" : 0.15, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
@@ -34,6 +34,6 @@
 
     "cpus" : 20, 
 
-    "env_name" : "BridgeWalker-v0"
+    "env_name" : "ObstqacleTraverser-v1"
 
 }
