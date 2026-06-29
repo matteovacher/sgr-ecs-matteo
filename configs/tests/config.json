@@ -12,7 +12,7 @@
     "range_bias" : 2, 
     "sigma_weight" : 0.3, 
     "sigma_bias" : 0.3, 
-    "threshold_weight" : 0.2, 
+    "threshold_weight" : 0.5, 
     "threshold_bias" : 0.15, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
@@ -32,8 +32,8 @@
     "n_steps" : 800, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 16, 
+    "cpus" : 20, 
 
-    "env_name" : "ObstacleTraverser-v1"
+    "env_name" : "BridgeWalker-v0"
 
 }
