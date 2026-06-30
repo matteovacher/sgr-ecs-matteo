@@ -29,7 +29,7 @@ from systems.save_gen_system import BothSaveGenSystem
 from systems.reproduction_system import BothModularCoReproductionSystem
 from systems.save_system import BothSaveSystem
 
-# here i test the new shape of cppn with less complexity, maybe will explore more instead of focusing on one type of solution, without bias query and with 2 outputs and co dominance 
+# here is the new modular cppn along with exp for diploid and haploid for general stat and for diff sigma on static env 
 
 def main() : 
     # first exp with diploidy 
@@ -45,99 +45,105 @@ def main() :
 
     config = Config(config)
 
-    results_manager = ResultsManager()
-    network_manager = NetworkManager(config)
-    function_pool = FunctionPool(config)
-    substrate_builder = SubstrateBuilder(config)
-    phenotype_builder = PhenotypeBuilder()
-    robot_generator = RobotGenerator()
-    robot_simulator = RobotSimulator(config)
-    parallel_tool = ParallelTool(config)
+    for k in range(config.number_of_config) :
+        if k != 0 :
+            config.threshold_weight = config.threshold_weight + config.threshold_var
 
-    for 
+        results_manager = ResultsManager()
+        network_manager = NetworkManager(config)
+        function_pool = FunctionPool(config)
+        substrate_builder = SubstrateBuilder(config)
+        phenotype_builder = PhenotypeBuilder()
+        robot_generator = RobotGenerator()
+        robot_simulator = RobotSimulator(config)
+        parallel_tool = ParallelTool(config)
 
-    for i in range(config.number_of_exp) : 
-        if i == 0 :
-            results_manager.add_results_both_path()
-        else : 
-            number = int(results_manager.number) + 1 
-            results_manager.set_both_path(results_manager.path, number)
 
-        type_genome = "diploid"
 
-        time1 = time.time()
+        for i in range(config.number_of_exp) : 
+            if i == 0 :
+                results_manager.add_results_both_path()
+            else : 
+                number = int(results_manager.number) + 1 
+                results_manager.set_both_path(results_manager.path, number)
 
-        genome_operator = GenomeOperator(config)
+            type_genome = "diploid"
 
-        build_system = BothModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
-        phenotype_system = BothModularCo2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
-        evaluation_system = BothEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome)
-        save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
-        reproduction_system = BothModularCoReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
-        save_system = BothSaveSystem(config, results_manager, type_genome)
+            time1 = time.time()
 
-        
-        world.add_builder_system(build_system)
-        world.add_step_system(phenotype_system)
-        world.add_step_system(evaluation_system)
-        world.add_step_system(save_gen_system)
-        world.add_step_system(reproduction_system)
+            genome_operator = GenomeOperator(config)
 
-        world.add_end_system(save_system)
-        
-        results_manager.begin_both_txt_file(world.all_systems, type_genome)
-        exp_name = __name__
-        results_manager.add_exp_name(exp_name, type_genome)
+            build_system = BothModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
+            phenotype_system = BothModularCo2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
+            evaluation_system = BothEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome)
+            save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
+            reproduction_system = BothModularCoReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
+            save_system = BothSaveSystem(config, results_manager, type_genome)
 
-        world.build()
-        for generation in range(config.generations) :
-            world.step()
-        world.end()
+            
+            world.add_builder_system(build_system)
+            world.add_step_system(phenotype_system)
+            world.add_step_system(evaluation_system)
+            world.add_step_system(save_gen_system)
+            world.add_step_system(reproduction_system)
 
-        time2 = time.time()
-        total_time = time2 - time1
-        print("Total time : ", time2 - time1)
+            world.add_end_system(save_system)
+            
+            results_manager.begin_both_txt_file(world.all_systems, type_genome)
+            exp_name = __name__
+            results_manager.add_exp_name(exp_name, type_genome)
 
+            world.build()
+            for generation in range(config.generations) :
+                world.step()
+            world.end()
+
+            time2 = time.time()
+            total_time = time2 - time1
+            print("Total time : ", time2 - time1)
+
+            world.reset()
+            # entity_manager.reset()
+            # not reset yet because i want to see if my render works and for that i need diff id for entities 
+
+            type_genome = 'haploid'
+
+            time1 = time.time()
+
+            genome_operator = HaploidOperator(config)
+
+            build_system = BothModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
+            phenotype_system = BothModularCo2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
+            evaluation_system = BothEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome)
+            save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
+            reproduction_system = BothModularCoReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
+            save_system = BothSaveSystem(config, results_manager, type_genome)
+
+            world.add_builder_system(build_system)
+            
+            world.add_step_system(phenotype_system)
+            world.add_step_system(evaluation_system)
+            world.add_step_system(save_gen_system)
+            world.add_step_system(reproduction_system)
+
+            world.add_end_system(save_system)
+
+            results_manager.begin_both_txt_file(world.all_systems, type_genome)
+            exp_name = __name__
+            results_manager.add_exp_name(exp_name, type_genome)
+
+            world.build()
+            for generation in range(config.generations) :
+                world.step()
+            world.end()
+
+            time2 = time.time()
+            print("Total time : ", time2 - time1)
+
+            print('Whole simulations took : ', time2 - time1 + total_time)
+            world.reset()
         world.reset()
-        # entity_manager.reset()
-        # not reset yet because i want to see if my render works and for that i need diff id for entities 
-
-        type_genome = 'haploid'
-
-        time1 = time.time()
-
-        genome_operator = HaploidOperator(config)
-
-        build_system = BothModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
-        phenotype_system = BothModularCo2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome)
-        evaluation_system = BothEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome)
-        save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
-        reproduction_system = BothModularCoReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
-        save_system = BothSaveSystem(config, results_manager, type_genome)
-
-        world.add_builder_system(build_system)
         
-        world.add_step_system(phenotype_system)
-        world.add_step_system(evaluation_system)
-        world.add_step_system(save_gen_system)
-        world.add_step_system(reproduction_system)
-
-        world.add_end_system(save_system)
-
-        results_manager.begin_both_txt_file(world.all_systems, type_genome)
-        exp_name = __name__
-        results_manager.add_exp_name(exp_name, type_genome)
-
-        world.build()
-        for generation in range(config.generations) :
-            world.step()
-        world.end()
-
-        time2 = time.time()
-        print("Total time : ", time2 - time1)
-
-        print('Whole simulations took : ', time2 - time1 + total_time)
-    
 
 def render() :
     
