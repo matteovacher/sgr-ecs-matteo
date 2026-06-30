@@ -62,6 +62,20 @@ class ResultsManager :
         else : 
             self.save = False 
         print('\n')
+    
+    def set_both_path(self, path, number):
+        self.save = True
+        self.path = path
+        self.number = number
+        local_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        results_dir = os.path.join(local_dir, "results")
+        self.abs_path_results = os.path.join(results_dir, '{}'.format(path), 'id_{}'.format(number))
+        self.abs_path_diploid = os.path.join(self.abs_path_results, 'diploid')
+        self.abs_path_haploid = os.path.join(self.abs_path_results, 'haploid')
+        for dir in [self.abs_path_diploid, self.abs_path_haploid]:
+            os.makedirs(os.path.join(dir, 'json'), exist_ok=True)
+            os.makedirs(os.path.join(dir, 'pkl'), exist_ok=True)
+            os.makedirs(os.path.join(dir, 'txt'), exist_ok=True)
 
     
     

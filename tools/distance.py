@@ -42,7 +42,7 @@ class DistanceTool :
            
            
 
-        number_of_nodes = sum(self.config.shape_of_cppn[1:])
+        number_of_nodes = len(node_evals1)
 
         normalized_weight_distance = weight_distance / (count_weight * 2 * self.config.max_weight)
    
@@ -111,7 +111,7 @@ class DistanceTool :
             act_functions_distance += 0 if self._same_activation(activation_function1, activation_function2) else 1
 
 
-        number_of_nodes = sum(self.config.shape_of_cppn[1:])
+        number_of_nodes = len(node_evals1)
 
         normnalized_act_functions_distance = act_functions_distance / number_of_nodes
         normalized_weight_distance = weight_distance / (count_weight * 2 * self.config.range_weight)
