@@ -198,8 +198,6 @@ class BothEvaluationSystem :
                 registry.add_tosave(self.generation, entity_id, tosave)
                 registry.snapshot(self.generation, entity_id)
 
-
-
             fitnesses = np.array(fitnesses)
             arg_sorted_fitnesses = np.argsort(fitnesses)
             bests = []
@@ -207,8 +205,7 @@ class BothEvaluationSystem :
             number_to_report = min(number_of_reported_individuals, len(entity_ids))
             for taken in range(number_to_report) : 
                 id = arg_sorted_fitnesses[len(entity_ids) - 1 - taken]
-                bests.append((ids[id], fitnesses[id], ages[id]))
-                    
+                bests.append((ids[id], fitnesses[id], ages[id])) 
             
             invalid = self.config.population - len(entity_ids)
 
