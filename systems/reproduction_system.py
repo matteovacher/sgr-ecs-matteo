@@ -611,7 +611,7 @@ class BothModularCoReproductionSystem :
                     parent2 = parents_ids.pop()
                     haploid_parent1 = registry.get_haploid(parent1)
                     haploid_parent2 = registry.get_haploid(parent2)
-                    connections, biases, functions, dominances, nodes = self.genome_operator.cocrossover_woth_modu_regu(haploid_parent1, haploid_parent2)
+                    connections, biases, functions, dominances, nodes = self.genome_operator.cocrossover_with_modu_regu(haploid_parent1, haploid_parent2)
                     child_id = self.entity_manager.create_entity()
                     children_entity_ids.append(child_id)
                     registry.add_haploid_parents(child_id, parent1, parent2)
