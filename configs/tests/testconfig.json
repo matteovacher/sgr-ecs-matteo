@@ -31,7 +31,7 @@
     "n_steps" : 1200, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 32, 
+    "cpus" : 20, 
 
     "env_name" : "CaveCrawler-v0"
 
