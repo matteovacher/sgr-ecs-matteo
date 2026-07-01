@@ -11,17 +11,17 @@
     "range_bias" : 2, 
     "sigma_weight" : 0.3, 
     "sigma_bias" : 0.3, 
-    "threshold_weight" : 0.7, 
+    "threshold_weight" : 0.8, 
     "threshold_bias" : 0.15, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
 
     "number_of_dominances" : 5, 
 
-    "generations" : 100, 
+    "generations" : 150, 
     "population" : 128, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 10, 
+    "number_in_tournament" : 13, 
     "number_of_elites" : 2, 
 
     "shape_of_cppn" :  [[11], [2, 2], [3, 3], [1, 1]], 
@@ -31,7 +31,7 @@
     "n_steps" : 1000, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 32, 
+    "cpus" : 25, 
 
     "env_name" : "CaveCrawler-v0"
 
