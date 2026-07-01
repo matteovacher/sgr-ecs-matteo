@@ -18,20 +18,20 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 150, 
+    "generations" : 200, 
     "population" : 128, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 13, 
-    "number_of_elites" : 2, 
+    "number_in_tournament" : 11, 
+    "number_of_elites" : 4, 
 
     "shape_of_cppn" :  [[11], [2, 2], [3, 3], [1, 1]], 
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : 1000, 
+    "n_steps" : 1200, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 25, 
+    "cpus" : 32, 
 
     "env_name" : "CaveCrawler-v0"
 
