@@ -11,7 +11,7 @@
     "range_bias" : 2, 
     "sigma_weight" : 0.3, 
     "sigma_bias" : 0.3, 
-    "threshold_weight" : 0.7, 
+    "threshold_weight" : 0.8, 
     "threshold_bias" : 0.15, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
@@ -21,8 +21,8 @@
     "generations" : 150, 
     "population" : 128, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 15, 
-    "number_of_elites" : 5, 
+    "number_in_tournament" : 20, 
+    "number_of_elites" : 10, 
 
     "shape_of_cppn" :  [[11], [2, 2], [3, 3], [1, 1]], 
 

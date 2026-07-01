@@ -195,7 +195,7 @@ def render() :
             images, _ = robot_simulator.simulate_render(body.body, controller_network, network_manager, config.n_steps)
 
             print('\n----- Rendering the simulation -----\n')
-            io.mimwrite(video_mp4_path, images, fps=30, macro_block_size=1)
+            io.mimwrite(video_mp4_path, images, fps=35, macro_block_size=1)
 
             print('\n----- Saved Successfully -----\n')
         
@@ -229,7 +229,7 @@ def render() :
                 
                     images, _ = robot_simulator.simulate_render(body.body, controller_network, network_manager, config.n_steps)
                     
-                    io.mimwrite(video_mp4_path, images, fps=30, macro_block_size=1)
+                    io.mimwrite(video_mp4_path, images, fps=35, macro_block_size=1)
                    
                     print('\n----- Saved Successfully -----\n')
         
