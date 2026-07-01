@@ -18,11 +18,11 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 200, 
+    "generations" : 150, 
     "population" : 128, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 11, 
-    "number_of_elites" : 4, 
+    "number_in_tournament" : 15, 
+    "number_of_elites" : 5, 
 
     "shape_of_cppn" :  [[11], [2, 2], [3, 3], [1, 1]], 
 
