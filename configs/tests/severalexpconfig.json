@@ -1,6 +1,6 @@
 {
 
-    "number_of_exp" : 4, 
+    "number_of_exp" : 3, 
     "number_of_config" : 3, 
     "threshold_var" : 0.25, 
 
@@ -24,7 +24,7 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 200, 
+    "generations" : 150, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 10, 

@@ -38,34 +38,38 @@ class RobotSimulator:
         return len(observation)
     
 
-    def simulate(self, id, robot, controller, n_steps, controller_manager) : 
-        env = self._get_env(robot) 
-        reward = 0  
+    def simulate(self, id, robot, controller, n_steps, controller_manager) :
+        try :
+            env = self._get_env(robot)
+            reward = 0
 
-        observation, _ = env.reset()
+            observation, _ = env.reset()
 
-        actuators = env.get_actuator_indices("robot")
-        inputs_size = math.ceil(math.sqrt(len(observation)))
+            actuators = env.get_actuator_indices("robot")
+            inputs_size = math.ceil(math.sqrt(len(observation)))
 
-        finished = False 
+            finished = False
 
-        for _ in range (n_steps) : 
-            observation.resize(inputs_size**2)
-            all_actions = controller_manager.activate(controller, observation)
-            action = np.array([all_actions[i] for i in actuators])
-            observation, step_reward, terminated, truncated, _ = env.step(action)
+            for _ in range (n_steps) :
+                observation.resize(inputs_size**2)
+                all_actions = controller_manager.activate(controller, observation)
+                action = np.array([all_actions[i] for i in actuators])
+                observation, step_reward, terminated, truncated, _ = env.step(action)
 
-            reward += step_reward
+                reward += step_reward
 
-            done = terminated or truncated 
+                done = terminated or truncated
 
-            if done : 
-                finished = True 
-                break 
+                if done :
+                    finished = True
+                    break
 
-        env.close() 
-        del env 
-        return id, reward, finished 
+            env.close()
+            del env
+            return id, reward, finished
+
+        except Exception :
+            return id, -1000, True
     
     def simulate_mode_env(self, id, robot, controller, n_steps, controller_manager, type_env) : 
         env = self._get_env_mode_env(robot, type_env) 
