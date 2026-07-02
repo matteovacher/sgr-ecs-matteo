@@ -689,7 +689,7 @@ class BothModularCo2WiBiPhenotypeSystem :
                 connections = self.robot_generator.get_full_connectivity(robot_grid)
                 registry.add_body(entity_id, robot_grid, connections)
 
-                out_act_func = lambda x : 0.5*np.tanh(x) + 1
+                out_act_func = lambda x : 0.5*np.tanh(x) + 1.1
                 observation_size = self.robot_simulator.get_observation_size(robot_grid)
                 grid_input_size = math.ceil(math.sqrt(observation_size))
                 controller_substrate_shape = self.substrate_builder.extract_controller_network_shape(grid_input_size, self.config)
@@ -726,7 +726,7 @@ class BothModularCo2WiBiPhenotypeSystem :
                 connections = self.robot_generator.get_full_connectivity(robot_grid)
                 registry.add_body(entity_id, robot_grid, connections)
 
-                out_act_func = lambda x : 0.5*np.tanh(x) + 1
+                out_act_func = lambda x : 0.5*np.tanh(x) + 1.1
                 observation_size = self.robot_simulator.get_observation_size(robot_grid)
                 grid_input_size = math.ceil(math.sqrt(observation_size))
                 controller_substrate_shape = self.substrate_builder.extract_controller_network_shape(grid_input_size, self.config)
