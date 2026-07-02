@@ -21,7 +21,7 @@
     "generations" : 150, 
     "population" : 128, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 20, 
+    "number_in_tournament" : 10, 
     "number_of_elites" : 10, 
 
     "shape_of_cppn" :  [[11], [2, 2], [3, 3], [1, 1]], 
