@@ -1,5 +1,5 @@
 import math 
-
+import numpy as np
 
 class PhenotypeSystem :
 
@@ -673,8 +673,8 @@ class BothModularCo2WiBiPhenotypeSystem :
                 cppn = registry.get_cppn(entity_id)
                 body_substrate_shape = self.substrate_builder.extract_body_network_shape(self.config)
                 body_substrate = self.substrate_builder.shape_into_coordinates(body_substrate_shape)
-                act_func = self.function_pool.pool["tanh"]
-                out_act_func = lambda x : x
+                act_func = np.tanh
+                out_act_func = np.tanh
                 node_evals, input_nodes, output_nodes = self.phenotype_builder.create_phenotype_network_without_bias_2_outputs(cppn, self.network_manager, body_substrate, act_func, out_act_func, sum, self.config.response, self.config.max_weight, self.config.max_bias, type_output = 0)
 
                 registry.add_body_network(entity_id, node_evals, input_nodes, output_nodes)
@@ -689,6 +689,7 @@ class BothModularCo2WiBiPhenotypeSystem :
                 connections = self.robot_generator.get_full_connectivity(robot_grid)
                 registry.add_body(entity_id, robot_grid, connections)
 
+                out_act_func = lambda x : 0.5*np.tanh(x) + 1
                 observation_size = self.robot_simulator.get_observation_size(robot_grid)
                 grid_input_size = math.ceil(math.sqrt(observation_size))
                 controller_substrate_shape = self.substrate_builder.extract_controller_network_shape(grid_input_size, self.config)
@@ -709,8 +710,8 @@ class BothModularCo2WiBiPhenotypeSystem :
                 cppn = registry.get_cppn(entity_id)
                 body_substrate_shape = self.substrate_builder.extract_body_network_shape(self.config)
                 body_substrate = self.substrate_builder.shape_into_coordinates(body_substrate_shape)
-                act_func = self.function_pool.pool["tanh"]
-                out_act_func = lambda x : x
+                act_func = np.tanh
+                out_act_func = np.tanh
                 node_evals, input_nodes, output_nodes = self.phenotype_builder.create_phenotype_network_without_bias_2_outputs(cppn, self.network_manager, body_substrate, act_func, out_act_func, sum, self.config.response, self.config.max_weight, self.config.max_bias, type_output = 0)
 
                 registry.add_body_network(entity_id, node_evals, input_nodes, output_nodes)
@@ -725,6 +726,7 @@ class BothModularCo2WiBiPhenotypeSystem :
                 connections = self.robot_generator.get_full_connectivity(robot_grid)
                 registry.add_body(entity_id, robot_grid, connections)
 
+                out_act_func = lambda x : 0.5*np.tanh(x) + 1
                 observation_size = self.robot_simulator.get_observation_size(robot_grid)
                 grid_input_size = math.ceil(math.sqrt(observation_size))
                 controller_substrate_shape = self.substrate_builder.extract_controller_network_shape(grid_input_size, self.config)

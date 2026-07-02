@@ -20,4 +20,6 @@ class FunctionPool :
             pool["tanh"] = lambda x : np.tanh(x)
         if "minus gaussian" in self.config.function_pool :
             pool["minus gaussian"] = lambda x : -np.exp(- x**2)
+        
         return pool
+    
