@@ -504,7 +504,7 @@ class BothModularCoReproductionSystem :
 
         if self.type_genome == 'diploid' :
 
-            entity_ids = [id for id in registry.get_all_id_with_fitness() if self.entity_manager.is_alive(id) and registry.has_controller_network(id)]
+            entity_ids = [id for id in registry.get_all_id_with_fitness() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) and registry.get_fitness(id).fitness > -1000]
 
             # les individus sans corps ne se reproduisent pas / individuals without body cannot reproduce 
 
@@ -520,7 +520,7 @@ class BothModularCoReproductionSystem :
             if len(entity_ids) < number_in_tournament :
                 raise RuntimeError('not enough valid individual to fit in the tournament. Please change HyperParameters or just the program.')
 
-            fitnesses = np.array([registry.get_fitness(id).fitness for id in entity_ids])
+            fitnesses = np.array([registry.get_fitness(id).fitness for id in entity_ids ])
             ids_of_sorted = np.argsort(fitnesses)
             for taken in range(number_of_elites) : 
                 id = ids_of_sorted[len(entity_ids) - 1 - taken]
@@ -574,7 +574,7 @@ class BothModularCoReproductionSystem :
     
         elif self.type_genome == 'haploid' : 
 
-            entity_ids = [id for id in registry.get_all_id_with_fitness() if self.entity_manager.is_alive(id) and registry.has_controller_network(id)]
+            entity_ids = [id for id in registry.get_all_id_with_fitness() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) and registry.get_fitness(id).fitness > -1000]
 
             # les individus sans corps ne se reproduisent pas / individuals without body cannot reproduce 
 

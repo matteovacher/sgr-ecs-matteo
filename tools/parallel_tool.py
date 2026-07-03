@@ -32,25 +32,37 @@ class ParallelTool :
             results.append(function(*arguments))
         return results
     
+    # def _process_parallel(self, function, chunk) : 
+
+    #     chunks = self._cut_chunk(chunk)
+    #     process_worker = lambda chunk : self._worker(function, chunk)
+
+    #     pool = ProcessPool(nodes = self.cpus)
+    #     results = pool.map(
+    #             process_worker,
+    #             chunks
+    #         )
+    #     pool.close()
+    #     pool.join()
+    #     pool.clear()
+        
+    #     results_formatted = []
+    #     for list_of_result in results : 
+    #         for result in list_of_result : 
+    #             results_formatted.append(result)
+        
+    #     return results_formatted 
+
+
     def _process_parallel(self, function, chunk) : 
-
-        chunks = self._cut_chunk(chunk)
-        process_worker = lambda chunk : self._worker(function, chunk)
-
-        pool = ProcessPool(nodes = self.cpus)
-        results = pool.map(
-                process_worker,
-                chunks
-            )
-        pool.close()
+        pool = multiprocess.Pool(self.cpus)
+        ars = [(args[0], pool.apply_async(function, args)) for args in chunk]
+        results = []
+        for entity_id, ar in ars : 
+            try : 
+                results.append(ar.get(timeout=30))     # 30 s max par robot
+            except Exception : 
+                results.append((entity_id, -1000, True))
+        pool.terminate()
         pool.join()
-        pool.clear()
-        
-        results_formatted = []
-        for list_of_result in results : 
-            for result in list_of_result : 
-                results_formatted.append(result)
-        
-        return results_formatted 
-
-
+        return results
