@@ -42,6 +42,9 @@ class ParallelTool :
                 process_worker,
                 chunks
             )
+        pool.close()
+        pool.join()
+        pool.clear()
         
         results_formatted = []
         for list_of_result in results : 

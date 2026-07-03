@@ -7,12 +7,12 @@
     "max_weight_cppn" : 20,
     "max_bias_cppn" : 20,
     
-    "range_weight" : 2, 
-    "range_bias" : 2, 
+    "range_weight" : 1, 
+    "range_bias" : 1, 
     "sigma_weight" : 0.1, 
     "sigma_bias" : 0.1, 
-    "threshold_weight" : 0.9, 
-    "threshold_bias" : 0.3, 
+    "threshold_weight" : 0.5, 
+    "threshold_bias" : 0.2, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
 
