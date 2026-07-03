@@ -28,7 +28,7 @@
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : 1000, 
+    "n_steps" : 1200, 
     "number_of_reported_individuals" : 40,
 
     "cpus" : 32, 
