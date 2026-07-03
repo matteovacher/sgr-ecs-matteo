@@ -74,7 +74,7 @@ class SubstrateBuilder:
             first_dim_locations = np.linspace(first_indice, 1.0, number_of_layer)
 
         elif np.sign(shape[0][0]) == -1 :
-            first_dim_locations = np.linspace(-1.0, -first_indice, number_of_layer)
+            first_dim_locations = np.linspace(-first_indice, -1.0, number_of_layer)
 
         for layer in shape :
             indice = abs(layer[0]) - 1
@@ -145,14 +145,57 @@ class SubstrateBuilder:
         return all_interval
 
 
+    def new_shape_into_coordinates(self, shape) :
+        
+        number_of_layer = len(shape)
+        first_indice = 1/number_of_layer
+        all_interval = []
+
+        if np.sign(shape[0][0]) == 1 :
+            first_dim_locations = np.linspace(first_indice, 1.0, number_of_layer)
+
+        elif np.sign(shape[0][0]) == -1 :
+            first_dim_locations = np.linspace(-first_indice, -1.0, number_of_layer)
+
+        for layer in shape :
+            indice = abs(layer[0]) - 1
+            location = first_dim_locations[indice]
+
+            if layer[-2] == layer[-1] and layer[-1] != 1 and indice == 2 and np.sign(shape[0][0]) == 1 :
+                number_of_points = layer[-1]
+                angle = 2*np.pi/number_of_points
+                radius = 1.0/2
+                last_coords = []
+                for i in range(number_of_points) :
+                    last_coords.append([radius*np.cos(angle*i), radius*np.sin(angle*i)])
+                raw_cart_product = list(it.product([location], last_coords))
+                all_coords = [(*e[:-1], *e[-1]) for e in raw_cart_product]
+                all_interval.append(all_coords)
+
+            else :
+                interval_array = []
+                for x in layer[1:] :
+                    interval_one_dimension = np.linspace(-1.0, 1, x) if (x>1) else [0.0]
+                    interval_array.append(interval_one_dimension)
+                all_coords = list(it.product([location], *interval_array))
+                all_interval.append(all_coords)
+
+        return all_interval
+
     def extract_body_network_shape(self, config):
 
         body_shape = config.body_shape
         shape_of_substrate = [
-            [1, 1, 1, 1, 1], 
-            [2, body_shape[0], body_shape[1], 1, 1], # the last 2 dim must be the same if you want to implement a circle 
-            [3, body_shape[0], body_shape[1], 5, 5]
+            [1, 3, 1], 
+            [2, body_shape[0], body_shape[1]],
+            [3, 5, 5]
         ]
+        # body_shape = config.body_shape
+        # shape_of_substrate = [
+        #     [1, 1, 1, 1, 1], 
+        #     [2, body_shape[0], body_shape[1], 1, 1], # the last 2 dim must be the same if you want to implement a circle 
+        #     [3, body_shape[0], body_shape[1], 5, 5]
+        # ]
         # shape_of_substrate = [
         #     [1, 1, 1, 1, 1], 
         #     [2, body_shape[0], body_shape[1], 5, 5], # the last 2 dim must be the same if you want to implement a circle 
@@ -173,10 +216,15 @@ class SubstrateBuilder:
     def extract_controller_network_shape(self, grid_input_size, config) :
         body_shape = config.body_shape
         controller_shape = [
-            [-1, grid_input_size, grid_input_size, 1, 1],
-            [-2, body_shape[0], body_shape[1], 1, 1], 
-            [-3, body_shape[0], body_shape[1], 1, 1]
+            [-1, grid_input_size, grid_input_size],
+            [-2, body_shape[0], body_shape[1]], 
+            [-3, body_shape[0], body_shape[1]]
         ]
+        # controller_shape = [
+        #     [-1, grid_input_size, grid_input_size, 1, 1],
+        #     [-2, body_shape[0], body_shape[1], 1, 1], 
+        #     [-3, body_shape[0], body_shape[1], 1, 1]
+        # ]
         # controller_shape = [
         #     [-1, grid_input_size, grid_input_size, 1, 1], 
         #     [-2, body_shape[0], body_shape[1], 5, 5], # here the last two dim are the same because i want a circle, the main objective here is that 
