@@ -11,7 +11,7 @@
     "range_bias" : 1.5, 
     "sigma_weight" : 0.2, 
     "sigma_bias" : 0.2, 
-    "threshold_weight" : 0.3, 
+    "threshold_weight" : 0.5, 
     "threshold_bias" : 0.2, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
