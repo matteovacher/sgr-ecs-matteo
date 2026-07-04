@@ -27,7 +27,7 @@ class RobotGenerator :
     #     return robot
     
     def is_valid_robot(self, robot) :
-        return is_connected(robot) and has_actuator(robot)
+        return (is_connected(robot)and has_actuator(robot)and np.count_nonzero(robot) >= 4)
     
     def get_full_connectivity(self, robot) :
         return get_full_connectivity(robot)

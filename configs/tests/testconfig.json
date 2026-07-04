@@ -7,12 +7,12 @@
     "max_weight_cppn" : 20,
     "max_bias_cppn" : 20,
     
-    "range_weight" : 1, 
-    "range_bias" : 1, 
-    "sigma_weight" : 0.1, 
-    "sigma_bias" : 0.1, 
-    "threshold_weight" : 0.1, 
-    "threshold_bias" : 0.15, 
+    "range_weight" : 1.5, 
+    "range_bias" : 1.5, 
+    "sigma_weight" : 0.2, 
+    "sigma_bias" : 0.2, 
+    "threshold_weight" : 0.4, 
+    "threshold_bias" : 0.2, 
     "threshold_function" : 0.2,
     "threshold_dominance" : 0.2, 
 
@@ -31,7 +31,7 @@
     "n_steps" : 1200, 
     "number_of_reported_individuals" : 40,
 
-    
+
     "cpus" : 32, 
 
     "env_name" : "CaveCrawler-v0"
