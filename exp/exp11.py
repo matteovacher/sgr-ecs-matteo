@@ -47,6 +47,8 @@ def main() :
     config = Config(config)
     results_manager = ResultsManager()
 
+    whole_time = time.time()
+
     for k in range(config.number_of_config) :
         if k != 0 :
             config.threshold_weight = config.threshold_weight + config.threshold_var
@@ -145,6 +147,7 @@ def main() :
             world.reset()
             entity_manager.reset()
         world.reset()
+    print('All simulations took : ', time.time() - whole_time)
         
 
 def render() :
