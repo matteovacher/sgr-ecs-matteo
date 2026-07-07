@@ -6,9 +6,6 @@ class GenomeOperator:
     def __init__(self, config):
         self.config = config 
 
-
-
-
     def nodes_by_layer(self, shape_of_cppn) :
         node = 0 
         nodes_by_layer = []
@@ -79,6 +76,94 @@ class GenomeOperator:
                 dominance1[node] = d1
                 dominance2[node] = d2
             previous_layer = nodes_by_layer[index_of_layer]
+        return connections1, connections2, bias1, bias2, activation_functions1, activation_functions2, dominance1, dominance2, nodes_by_layer
+
+    def generate_first_generation_of_genome_with_modu_regu_0_init(self, nodes_by_layer, functions_pool) :
+        output_activation_function = lambda x : x
+
+        connections1 = {}
+        connections2 = {}
+        bias1 = {}
+        bias2 = {}
+        activation_functions1 = {}
+        activation_functions2 = {}
+        dominance1 = {}
+        dominance2 = {}
+
+        list_of_keys = list(functions_pool.keys())
+
+        for index_of_layer in range(len(nodes_by_layer)) :
+            if index_of_layer == 0 :
+                previous_layer = nodes_by_layer[index_of_layer]
+                continue 
+            if len(previous_layer) == 1 and len(nodes_by_layer[index_of_layer]) == 1 : 
+                for node in nodes_by_layer[index_of_layer][0] :
+                    for previous_node in previous_layer[0] :
+                        weight1 = self.config.range_weight * np.random.uniform(-1, 1)
+                        weight2 = self.config.range_weight * np.random.uniform(-1, 1)
+                        connections1[(previous_node, node)] = weight1
+                        connections2[(previous_node, node)] = weight2
+                    d1 = 1
+                    d2 = 1
+                    b1 = self.config.range_bias * np.random.uniform(-1, 1)
+                    b2 = self.config.range_bias * np.random.uniform(-1, 1)
+                    c1 = np.random.randint(0, len(list_of_keys)) 
+                    c2 = np.random.randint(0, len(list_of_keys))
+                    act_function1 = functions_pool[list_of_keys[c1]]        
+                    act_function2 = functions_pool[list_of_keys[c2]]
+                    bias1[node] = b1
+                    bias2[node] = b2
+                    activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function 
+                    activation_functions2[node] = act_function2 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                    dominance1[node] = d1
+                    dominance2[node] = d2
+                previous_layer = nodes_by_layer[index_of_layer]
+            elif len(previous_layer) == 1 and len(nodes_by_layer[index_of_layer]) > 1 :
+                for branch in range(len(nodes_by_layer[index_of_layer])) :
+                    for node in nodes_by_layer[index_of_layer][branch] :
+                        for previous_node in previous_layer[0] :
+                            weight1 = self.config.range_weight * np.random.uniform(-1, 1)
+                            weight2 = self.config.range_weight * np.random.uniform(-1, 1)
+                            connections1[(previous_node, node)] = weight1
+                            connections2[(previous_node, node)] = weight2
+                        d1 = 1
+                        d2 = 1
+                        b1 = self.config.range_bias * np.random.uniform(-1, 1)
+                        b2 = self.config.range_bias * np.random.uniform(-1, 1)
+                        c1 = np.random.randint(0, len(list_of_keys))
+                        c2 = np.random.randint(0, len(list_of_keys))
+                        act_function1 = functions_pool[list_of_keys[c1]]
+                        act_function2 = functions_pool[list_of_keys[c2]]
+                        bias1[node] = b1
+                        bias2[node] = b2
+                        activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        activation_functions2[node] = act_function2 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        dominance1[node] = d1
+                        dominance2[node] = d2
+                previous_layer = nodes_by_layer[index_of_layer]
+            elif len(previous_layer) > 1 and len(nodes_by_layer[index_of_layer]) > 1 :
+                for branch in range(len(nodes_by_layer[index_of_layer])) :
+                    for node in nodes_by_layer[index_of_layer][branch] :
+                        for previous_node in previous_layer[branch] :
+                            weight1 = self.config.range_weight * np.random.uniform(-1, 1)
+                            weight2 = self.config.range_weight * np.random.uniform(-1, 1)
+                            connections1[(previous_node, node)] = weight1
+                            connections2[(previous_node, node)] = weight2
+                        d1 = 1
+                        d2 = 1
+                        b1 = self.config.range_bias * np.random.uniform(-1, 1)
+                        b2 = self.config.range_bias * np.random.uniform(-1, 1)
+                        c1 = np.random.randint(0, len(list_of_keys))
+                        c2 = np.random.randint(0, len(list_of_keys))
+                        act_function1 = functions_pool[list_of_keys[c1]]
+                        act_function2 = functions_pool[list_of_keys[c2]]
+                        bias1[node] = b1
+                        bias2[node] = b2
+                        activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        activation_functions2[node] = act_function2 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        dominance1[node] = d1
+                        dominance2[node] = d2
+                previous_layer = nodes_by_layer[index_of_layer]
         return connections1, connections2, bias1, bias2, activation_functions1, activation_functions2, dominance1, dominance2, nodes_by_layer
 
     def generate_first_generation_of_genome_with_modu_regu(self, nodes_by_layer, functions_pool) :
@@ -235,21 +320,21 @@ class GenomeOperator:
 
             for node, previous_nodes in self._incoming_by_node(previous_layer, current_layer) :
                 if genome.dominances[0][node] > genome.dominances[1][node] :
-                    bias[node] = genome.biases[0][node]
-                    functions[node] = genome.functions[0][node]
+                    bias[node] = copy.deepcopy(genome.biases[0][node])
+                    functions[node] = copy.deepcopy(genome.functions[0][node])
                     for previous_node in previous_nodes :
-                        connections[(previous_node, node)] = genome.connections[0][(previous_node, node)]
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[0][(previous_node, node)])
                 elif genome.dominances[0][node] < genome.dominances[1][node] :
-                    bias[node] = genome.biases[1][node]
-                    functions[node] = genome.functions[1][node]
+                    bias[node] = copy.deepcopy(genome.biases[1][node])
+                    functions[node] = copy.deepcopy(genome.functions[1][node])
                     for previous_node in previous_nodes :
-                        connections[(previous_node, node)] = genome.connections[1][(previous_node, node)]
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[1][(previous_node, node)])
                 else :
                     choice = np.random.randint(0, 2)
-                    bias[node] = genome.biases[choice][node]
-                    functions[node] = genome.functions[choice][node]
+                    bias[node] = copy.deepcopy(genome.biases[choice][node])
+                    functions[node] = copy.deepcopy(genome.functions[choice][node])
                     for previous_node in previous_nodes :
-                        connections[(previous_node, node)] = genome.connections[choice][(previous_node, node)]
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[choice][(previous_node, node)])
 
             previous_layer = current_layer
 
@@ -269,7 +354,7 @@ class GenomeOperator:
             for node in genome.nodes[index_of_layer] :
                     
                 if genome.dominances[0][node] > genome.dominances[1][node] :
-                    bias[node] = genome.biases[0][node]
+                    bias[node] = copy.deepcopy(genome.biases[0][node])
                     functions[node] = genome.functions[0][node]
                     for previous_node in previous_layer :
                         connections[(previous_node, node)] = genome.connections[0][(previous_node, node)]
@@ -660,6 +745,36 @@ class HaploidOperator :
                     weight = self.config.range_weight * np.random.uniform(-1, 1)
                     connections[(previous_node, node)] = weight
                 d = np.random.randint(1, self.config.number_of_dominances + 1)
+                b = self.config.range_bias * np.random.uniform(-1, 1)
+                c = np.random.randint(0, len(list_of_keys))
+                act_function = functions_pool[list_of_keys[c]]
+                biases[node] = b
+                activation_functions[node] = act_function if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                dominances[node] = d
+            previous_layer = current_layer
+        return connections, biases, activation_functions, dominances, nodes_by_layer
+
+
+    def generate_first_generation_of_genome_with_modu_regu_0_init(self, nodes_by_layer, functions_pool) :
+        output_activation_function = lambda x : x
+
+        connections = {}
+        biases = {}
+        activation_functions = {}
+        dominances = {}
+
+        list_of_keys = list(functions_pool.keys())
+
+        for index_of_layer in range(len(nodes_by_layer)) :
+            if index_of_layer == 0 :
+                previous_layer = nodes_by_layer[index_of_layer]
+                continue
+            current_layer = nodes_by_layer[index_of_layer]
+            for node, previous_nodes in self._incoming_by_node(previous_layer, current_layer) :
+                for previous_node in previous_nodes :
+                    weight = self.config.range_weight * np.random.uniform(-1, 1)
+                    connections[(previous_node, node)] = weight
+                d = 1
                 b = self.config.range_bias * np.random.uniform(-1, 1)
                 c = np.random.randint(0, len(list_of_keys))
                 act_function = functions_pool[list_of_keys[c]]
