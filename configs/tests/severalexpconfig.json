@@ -1,7 +1,7 @@
 {
 
-    "number_of_exp" : 3, 
-    "number_of_config" : 5, 
+    "number_of_exp" : 2, 
+    "number_of_config" : 1, 
     "threshold_var" : 0.15, 
 
 
@@ -15,11 +15,11 @@
     
     "range_weight" : 1, 
     "range_bias" : 1, 
-    "sigma_weight" : 0.2, 
-    "sigma_bias" : 0.3, 
-    "threshold_weight" : 0.2, 
-    "threshold_bias" : 0.15, 
-    "threshold_function" : 0.2,
+    "sigma_weight" : 0.1, 
+    "sigma_bias" : 0.1, 
+    "threshold_weight" : 0.15, 
+    "threshold_bias" : 0.08, 
+    "threshold_function" : 0.1,
     "threshold_dominance" : 0.2, 
 
     "number_of_dominances" : 5, 
@@ -37,8 +37,8 @@
     "n_steps" : 1200, 
     "number_of_reported_individuals" : 40,
 
-    "cpus" : 20, 
+    "cpus" : 32, 
 
-    "env_name" : "CaveCrawler-v0"
+    "env_name" : "Pusher-v0"
 
 }
