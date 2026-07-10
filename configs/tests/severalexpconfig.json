@@ -39,6 +39,6 @@
 
     "cpus" : 32, 
 
-    "env_name" : "BidirectionalWalker-v0"
+    "env_name" : "BridgeWalker-v0"
 
 }
