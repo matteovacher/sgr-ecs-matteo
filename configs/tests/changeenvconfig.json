@@ -1,6 +1,6 @@
 {
 
-    "number_of_exp" : 2, 
+    "number_of_exp" : 3, 
     "number_of_config" : 1, 
     "threshold_var" : 0.15, 
 
@@ -15,16 +15,17 @@
     
     "range_weight" : 1, 
     "range_bias" : 1, 
-    "sigma_weight" : 0.1, 
+    "sigma_weight" : 0.15, 
     "sigma_bias" : 0.1, 
     "threshold_weight" : 0.15, 
-    "threshold_bias" : 0.08, 
+    "threshold_bias" : 0.1, 
     "threshold_function" : 0.1,
     "threshold_dominance" : 0.2, 
 
     "number_of_dominances" : 5, 
 
-    "generations" : 150, 
+    "switch" : 20, 
+    "generations" : 200, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 10, 
@@ -34,11 +35,11 @@
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : 1200, 
+    "n_steps" : 1000, 
     "number_of_reported_individuals" : 40,
 
     "cpus" : 32, 
 
-    "env_name" : "Carrier-v0"
+    "env_name" : ["Pusher-v0", "ObstacleTraverser-v0"]
 
 }
