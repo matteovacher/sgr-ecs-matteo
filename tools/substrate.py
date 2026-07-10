@@ -182,6 +182,16 @@ class SubstrateBuilder:
 
         return all_interval
 
+    def extract_former_body_network_shape(self, config):
+
+        body_shape = config.body_shape
+        shape_of_substrate = [
+            [1, 1, 1, 1, 1], 
+            [2, body_shape[0], body_shape[1], 1, 1], # the last 2 dim must be the same if you want to implement a circle 
+            [3, body_shape[0], body_shape[1], 5, 5]
+        ]
+        return shape_of_substrate
+    
     def extract_body_network_shape(self, config):
 
         body_shape = config.body_shape
@@ -213,6 +223,15 @@ class SubstrateBuilder:
         ]
         return shape_of_substrate 
         
+    def extract_former_controller_network_shape(self, grid_input_size, config) :
+        body_shape = config.body_shape
+        controller_shape = [
+            [-1, grid_input_size, grid_input_size, 1, 1],
+            [-2, body_shape[0], body_shape[1], 1, 1], 
+            [-3, body_shape[0], body_shape[1], 1, 1]
+        ]
+        return controller_shape
+    
     def extract_controller_network_shape(self, grid_input_size, config) :
         body_shape = config.body_shape
         controller_shape = [

@@ -24,13 +24,13 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 100, 
+    "generations" : 150, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 10, 
     "number_of_elites" : 10, 
 
-    "shape_of_cppn" :  [[7], [5], [3, 3], [1, 1]], 
+    "shape_of_cppn" :  [[11], [5], [3, 3], [1, 1]], 
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
@@ -39,6 +39,6 @@
 
     "cpus" : 32, 
 
-    "env_name" : "BridgeWalker-v0"
+    "env_name" : "Pusher-v0"
 
 }

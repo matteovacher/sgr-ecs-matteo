@@ -47,7 +47,7 @@ class PhenotypeBuilder :
 
         weight = output[type_output]
 
-        if abs(weight) > 0.05 and abs(weight) < max_weight:
+        if abs(weight) > 0.1 and abs(weight) < max_weight:
             return weight
         elif abs(weight) >= max_weight :
             return max_weight if weight > 0 else -max_weight
