@@ -24,7 +24,7 @@
 
     "number_of_dominances" : 5, 
 
-    "generations" : 150, 
+    "generations" : 100, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 10, 
@@ -39,6 +39,6 @@
 
     "cpus" : 32, 
 
-    "env_name" : "Carrier-v0"
+    "env_name" : "Pusher-v1"
 
 }
