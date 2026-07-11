@@ -30,7 +30,7 @@
     "number_in_tournament" : 10, 
     "number_of_elites" : 10, 
 
-    "shape_of_cppn" :  [[11], [5], [3, 3], [1, 1]], 
+    "shape_of_cppn" :  [[7], [5], [3, 3], [1, 1]], 
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
