@@ -1009,9 +1009,9 @@ class BothEnvNewModular2WiBiPhenotypeSystem :
             self.generation += 1
 
             if self.switched : 
-                entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
+                entity_ids = [id for id in registry.get_all_id_with_haploid() if self.entity_manager.is_alive(id)]
             else : 
-                entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) == False]
+                entity_ids = [id for id in registry.get_all_id_with_haploid() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) == False]
 
             for entity_id in entity_ids : 
                 haploid = registry.get_haploid(entity_id)
@@ -1225,9 +1225,9 @@ class BothEnvModular2WiBiPhenotypeSystem :
             self.generation += 1
 
             if self.switched : 
-                entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
+                entity_ids = [id for id in registry.get_all_id_with_haploid() if self.entity_manager.is_alive(id)]
             else : 
-                entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) == False]
+                entity_ids = [id for id in registry.get_all_id_with_haploid() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) == False]
 
             for entity_id in entity_ids : 
                 haploid = registry.get_haploid(entity_id)
