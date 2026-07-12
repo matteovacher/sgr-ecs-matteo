@@ -20,7 +20,7 @@
     "threshold_weight" : 0.2, 
     "threshold_bias" : 0.15, 
     "threshold_function" : 0.15,
-    "threshold_dominance" : 0.04, 
+    "threshold_dominance" : 0.07, 
 
     "number_of_dominances" : 5, 
 

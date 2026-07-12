@@ -13,15 +13,17 @@ class RobotGenerator :
         robot = np.zeros((body_shape[0], body_shape[1]))
         horizontal = np.linspace(-1, 1, body_shape[0])
         vertical = np.linspace(-1, 1, body_shape[1])
+        bias = 0.5
         for i in range(body_shape[0]) :
             for j in range(body_shape[1]) :
-                inputs = [horizontal[i], np.pi, vertical[j]]
+                inputs = [horizontal[i], bias, vertical[j]]
                 outputs = network_manager.activate(body_network, inputs)
                 robot[i, j] = np.argmax(outputs)
         return robot
 
     def generate_former_robot_body_from_network(self, body_network, network_manager, body_shape) :
-        body_outputs = network_manager.activate(body_network, [np.pi])
+        bias = 0.5
+        body_outputs = network_manager.activate(body_network, [bias])
         formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
         robot = np.argmax(formated, 2)
         return robot
@@ -44,13 +46,14 @@ class RobotGenerator :
     #     return robot
 
     def generate_robot_body_from_network_and_env(self, body_network, network_manager, body_shape, type_env) :
+        bias = 0.5
         if type_env == 0 : 
             robot = np.zeros((body_shape[0], body_shape[1]))
             horizontal = np.linspace(-1, 1, body_shape[0])
             vertical = np.linspace(-1, 1, body_shape[1])
             for i in range(body_shape[0]) :
                 for j in range(body_shape[1]) :
-                    inputs = [horizontal[i], np.pi, vertical[j]]
+                    inputs = [horizontal[i], bias, vertical[j]]
                     outputs = network_manager.activate(body_network, inputs)
                     robot[i, j] = np.argmax(outputs)
         elif type_env == 1 :
@@ -59,7 +62,19 @@ class RobotGenerator :
             vertical = np.linspace(-1, 1, body_shape[1])
             for i in range(body_shape[0]) :
                 for j in range(body_shape[1]) :
-                    inputs = [horizontal[i], -np.pi, vertical[j]]
+                    inputs = [horizontal[i], - bias, vertical[j]]
                     outputs = network_manager.activate(body_network, inputs)
                     robot[i, j] = np.argmax(outputs)
+        return robot
+    
+    def generate_former_robot_body_from_network_and_env(self, body_network, network_manager, body_shape, type_env) :
+        bias = 0.5
+        if type_env == 0 : 
+            body_outputs = network_manager.activate(body_network, [bias])
+            formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
+            robot = np.argmax(formated, 2)
+        elif type_env == 1 :
+            body_outputs = network_manager.activate(body_network, [- bias])
+            formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
+            robot = np.argmax(formated, 2)
         return robot
