@@ -15,23 +15,23 @@
     
     "range_weight" : 1, 
     "range_bias" : 1, 
-    "sigma_weight" : 0.15, 
-    "sigma_bias" : 0.1, 
-    "threshold_weight" : 0.15, 
-    "threshold_bias" : 0.1, 
-    "threshold_function" : 0.1,
-    "threshold_dominance" : 0.2, 
+    "sigma_weight" : 0.2, 
+    "sigma_bias" : 0.2, 
+    "threshold_weight" : 0.2, 
+    "threshold_bias" : 0.15, 
+    "threshold_function" : 0.15,
+    "threshold_dominance" : 0.07, 
 
     "number_of_dominances" : 5, 
 
     "switch" : 20, 
-    "generations" : 200, 
+    "generations" : 300, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 10, 
     "number_of_elites" : 10, 
 
-    "shape_of_cppn" :  [[7], [5], [3, 3], [1, 1]], 
+    "shape_of_cppn" :  [[11], [5], [3, 3], [1, 1]], 
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
@@ -40,6 +40,6 @@
 
     "cpus" : 32, 
 
-    "env_name" : ["Pusher-v0", "ObstacleTraverser-v0"]
+    "env_name" : ["Pusher-v0", "Walker-v0"]
 
 }
