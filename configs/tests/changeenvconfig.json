@@ -25,7 +25,7 @@
     "number_of_dominances" : 5, 
 
     "switch" : 20, 
-    "generations" : 300, 
+    "generations" : 360, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 10, 
