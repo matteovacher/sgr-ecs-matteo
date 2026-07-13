@@ -308,7 +308,7 @@ class BothEnvEvaluationSystem() :
                 controllers.append(controller)
                 bodies.append(body.body)
 
-            n_steps_list = [self.config.n_steps for _ in range(len(entity_ids))]
+            n_steps_list = [self.config.n_steps[self.type_env] for _ in range(len(entity_ids))]
             network_manager_list = [self.network_manager for _ in range(len(entity_ids))]
             function = self.robot_simulator.simulate_mode_env
             type_envs = [self.type_env for _ in range(len(entity_ids))]
@@ -365,7 +365,7 @@ class BothEnvEvaluationSystem() :
                 controllers.append(controller)
                 bodies.append(body.body)
 
-            n_steps_list = [self.config.n_steps for _ in range(len(entity_ids))]
+            n_steps_list = [self.config.n_steps[self.type_env] for _ in range(len(entity_ids))]
             network_manager_list = [self.network_manager for _ in range(len(entity_ids))]
             function = self.robot_simulator.simulate_mode_env
             type_envs = [self.type_env for _ in range(len(entity_ids))]
