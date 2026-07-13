@@ -62,7 +62,7 @@ class RobotGenerator :
             vertical = np.linspace(-1, 1, body_shape[1])
             for i in range(body_shape[0]) :
                 for j in range(body_shape[1]) :
-                    inputs = [horizontal[i], - bias, vertical[j]]
+                    inputs = [horizontal[i], bias, vertical[j]]
                     outputs = network_manager.activate(body_network, inputs)
                     robot[i, j] = np.argmax(outputs)
         return robot
@@ -74,7 +74,7 @@ class RobotGenerator :
             formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
             robot = np.argmax(formated, 2)
         elif type_env == 1 :
-            body_outputs = network_manager.activate(body_network, [- bias])
+            body_outputs = network_manager.activate(body_network, [ bias])
             formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
             robot = np.argmax(formated, 2)
         return robot
