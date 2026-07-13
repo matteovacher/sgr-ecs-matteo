@@ -250,6 +250,8 @@ class SubstrateBuilder:
         #     [-3, body_shape[0], body_shape[1], 1, 1] # i want the cppn to detect which connection to reinforce 
         # ]
         return controller_shape
+    
+    
 
 
             

@@ -78,3 +78,10 @@ class RobotGenerator :
             formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
             robot = np.argmax(formated, 2)
         return robot
+    
+    def generate_other_robot_body_from_network_and_env(self, body_network, network_manager, body_shape) :
+        bias = 0.5
+        body_outputs = network_manager.activate(body_network, [bias])
+        formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
+        robot = np.argmax(formated, 2)
+        return robot

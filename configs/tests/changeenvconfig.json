@@ -21,7 +21,7 @@
     "threshold_bias" : 0.15, 
     "threshold_function" : 0.15, 
 
-    "threshold_dominance" : 0.03,
+    "threshold_dominance" : 0.15,
     "number_of_dominances" : 5, 
 
     "switch" : 20, 
