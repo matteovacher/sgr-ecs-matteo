@@ -1,6 +1,6 @@
 {
 
-    "number_of_exp" : 2, 
+    "number_of_exp" : 5, 
     "number_of_config" : 1, 
     "threshold_var" : 0.15, 
 
@@ -17,15 +17,15 @@
     "range_bias" : 1, 
     "sigma_weight" : 0.2, 
     "sigma_bias" : 0.2, 
-    "threshold_weight" : 0.2, 
-    "threshold_bias" : 0.15, 
-    "threshold_function" : 0.15, 
+    "threshold_weight" : 0.15, 
+    "threshold_bias" : 0.10, 
+    "threshold_function" : 0.10, 
 
-    "threshold_dominance" : 0.07,
+    "threshold_dominance" : 0.05,
     "number_of_dominances" : 5, 
 
     "switch" : 20, 
-    "generations" : 200, 
+    "generations" : 300, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 10, 

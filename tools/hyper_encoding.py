@@ -139,7 +139,7 @@ class PhenotypeBuilder :
     def _query_other_cppn_weight_2_outputs(self, cppn, network_manager, coordinate1, coordinate2, one_towards_two, max_weight, type_output, type_env) :
 
         distance = self._distance(coordinate1, coordinate2)
-        bias = np.pi/2 if type_env == 0 else -np.pi/2
+        bias = 2.5 if type_env == 0 else -2.5
         if one_towards_two :
             inputs = [*coordinate1, *coordinate2, distance, bias]
         else :
