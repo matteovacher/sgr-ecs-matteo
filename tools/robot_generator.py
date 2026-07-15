@@ -68,7 +68,7 @@ class RobotGenerator :
         return robot
     
     def generate_former_robot_body_from_network_and_env(self, body_network, network_manager, body_shape, type_env) :
-        bias = 0.5
+        bias = 1
         if type_env == 0 : 
             body_outputs = network_manager.activate(body_network, [bias])
             formated = np.reshape(body_outputs, (body_shape[0], body_shape[1], len(self.TYPES_OF_VOXELS)))
