@@ -5,6 +5,12 @@ class GenomeOperator:
 
     def __init__(self, config):
         self.config = config 
+        self.dominance_ties = 0
+        self.dominance_comparisons = 0 
+
+    def reset_dominance_counters(self) :
+        self.dominance_ties = 0
+        self.dominance_comparisons = 0
 
     def nodes_by_layer(self, shape_of_cppn) :
         node = 0 
@@ -165,6 +171,94 @@ class GenomeOperator:
                         dominance2[node] = d2
                 previous_layer = nodes_by_layer[index_of_layer]
         return connections1, connections2, bias1, bias2, activation_functions1, activation_functions2, dominance1, dominance2, nodes_by_layer
+    
+    def generate_uniform_first_generation_of_genome_with_modu_regu(self, nodes_by_layer, functions_pool) :
+        output_activation_function = lambda x : x
+
+        connections1 = {}
+        connections2 = {}
+        bias1 = {}
+        bias2 = {}
+        activation_functions1 = {}
+        activation_functions2 = {}
+        dominance1 = {}
+        dominance2 = {}
+
+        list_of_keys = list(functions_pool.keys())
+
+        for index_of_layer in range(len(nodes_by_layer)) :
+            if index_of_layer == 0 :
+                previous_layer = nodes_by_layer[index_of_layer]
+                continue 
+            if len(previous_layer) == 1 and len(nodes_by_layer[index_of_layer]) == 1 : 
+                for node in nodes_by_layer[index_of_layer][0] :
+                    for previous_node in previous_layer[0] :
+                        weight1 = self.config.range_weight * np.random.uniform(-1, 1)
+                        weight2 = self.config.range_weight * np.random.uniform(-1, 1)
+                        connections1[(previous_node, node)] = weight1
+                        connections2[(previous_node, node)] = weight2
+                    d1 = np.random.uniform(0, 1)
+                    d2 = np.random.uniform(0, 1)
+                    b1 = self.config.range_bias * np.random.uniform(-1, 1)
+                    b2 = self.config.range_bias * np.random.uniform(-1, 1)
+                    c1 = np.random.randint(0, len(list_of_keys)) 
+                    c2 = np.random.randint(0, len(list_of_keys))
+                    act_function1 = functions_pool[list_of_keys[c1]]        
+                    act_function2 = functions_pool[list_of_keys[c2]]
+                    bias1[node] = b1
+                    bias2[node] = b2
+                    activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function 
+                    activation_functions2[node] = act_function2 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                    dominance1[node] = d1
+                    dominance2[node] = d2
+                previous_layer = nodes_by_layer[index_of_layer]
+            elif len(previous_layer) == 1 and len(nodes_by_layer[index_of_layer]) > 1 :
+                for branch in range(len(nodes_by_layer[index_of_layer])) :
+                    for node in nodes_by_layer[index_of_layer][branch] :
+                        for previous_node in previous_layer[0] :
+                            weight1 = self.config.range_weight * np.random.uniform(-1, 1)
+                            weight2 = self.config.range_weight * np.random.uniform(-1, 1)
+                            connections1[(previous_node, node)] = weight1
+                            connections2[(previous_node, node)] = weight2
+                        d1 = np.random.uniform(0, 1)
+                        d2 = np.random.uniform(0, 1)
+                        b1 = self.config.range_bias * np.random.uniform(-1, 1)
+                        b2 = self.config.range_bias * np.random.uniform(-1, 1)
+                        c1 = np.random.randint(0, len(list_of_keys))
+                        c2 = np.random.randint(0, len(list_of_keys))
+                        act_function1 = functions_pool[list_of_keys[c1]]
+                        act_function2 = functions_pool[list_of_keys[c2]]
+                        bias1[node] = b1
+                        bias2[node] = b2
+                        activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        activation_functions2[node] = act_function2 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        dominance1[node] = d1
+                        dominance2[node] = d2
+                previous_layer = nodes_by_layer[index_of_layer]
+            elif len(previous_layer) > 1 and len(nodes_by_layer[index_of_layer]) > 1 :
+                for branch in range(len(nodes_by_layer[index_of_layer])) :
+                    for node in nodes_by_layer[index_of_layer][branch] :
+                        for previous_node in previous_layer[branch] :
+                            weight1 = self.config.range_weight * np.random.uniform(-1, 1)
+                            weight2 = self.config.range_weight * np.random.uniform(-1, 1)
+                            connections1[(previous_node, node)] = weight1
+                            connections2[(previous_node, node)] = weight2
+                        d1 = np.random.uniform(0, 1)
+                        d2 = np.random.uniform(0, 1)
+                        b1 = self.config.range_bias * np.random.uniform(-1, 1)
+                        b2 = self.config.range_bias * np.random.uniform(-1, 1)
+                        c1 = np.random.randint(0, len(list_of_keys))
+                        c2 = np.random.randint(0, len(list_of_keys))
+                        act_function1 = functions_pool[list_of_keys[c1]]
+                        act_function2 = functions_pool[list_of_keys[c2]]
+                        bias1[node] = b1
+                        bias2[node] = b2
+                        activation_functions1[node] = act_function1 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        activation_functions2[node] = act_function2 if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                        dominance1[node] = d1
+                        dominance2[node] = d2
+                previous_layer = nodes_by_layer[index_of_layer]
+        return connections1, connections2, bias1, bias2, activation_functions1, activation_functions2, dominance1, dominance2, nodes_by_layer
 
     def generate_first_generation_of_genome_with_modu_regu(self, nodes_by_layer, functions_pool) :
         output_activation_function = lambda x : x
@@ -288,6 +382,9 @@ class GenomeOperator:
             previous_layer = genome.nodes[index_of_layer]
 
         return connections, bias, functions
+    
+
+
 
     def _incoming_by_node(self, previous_layer, current_layer) :
 
@@ -336,6 +433,42 @@ class GenomeOperator:
                     for previous_node in previous_nodes :
                         connections[(previous_node, node)] = copy.deepcopy(genome.connections[choice][(previous_node, node)])
 
+            previous_layer = current_layer
+
+        return connections, bias, functions
+
+    def uniform_dominance_with_modu_regu(self, genome) :
+
+        connections = {}
+        bias = {}
+        functions = {}
+
+        for index_of_layer in range(len(genome.nodes)) :
+            if index_of_layer == 0 :
+                previous_layer = genome.nodes[index_of_layer]
+                continue
+
+            current_layer = genome.nodes[index_of_layer]
+
+            for node, previous_nodes in self._incoming_by_node(previous_layer, current_layer) :
+                self.dominance_comparisons += 1
+                if genome.dominances[0][node] > genome.dominances[1][node] :
+                    bias[node] = copy.deepcopy(genome.biases[0][node])
+                    functions[node] = copy.deepcopy(genome.functions[0][node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[0][(previous_node, node)])
+                elif genome.dominances[0][node] < genome.dominances[1][node] :
+                    bias[node] = copy.deepcopy(genome.biases[1][node])
+                    functions[node] = copy.deepcopy(genome.functions[1][node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[1][(previous_node, node)])
+                else : 
+                    self.dominance_ties += 1
+                    choice = 0
+                    bias[node] = copy.deepcopy(genome.biases[choice][node])
+                    functions[node] = copy.deepcopy(genome.functions[choice][node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[choice][(previous_node, node)])
             previous_layer = current_layer
 
         return connections, bias, functions
@@ -694,12 +827,61 @@ class GenomeOperator:
                     dominances[node] = choice
 
         return genome
+    
+    def _reflect(self, value, low, high) :
+        while value < low or value > high :
+            if value < low :
+                value = low + (low - value)
+            if value > high :
+                value = high - (value - high)
+        return value
+
+    def mutate_uniform_with_modu_regu(self, genome, sigma_weight, sigma_bias, threshold_weight, threshold_bias, threshold_function, threshold_dominance, functions_pool) :
+        output_nodes = [node for branch in genome.nodes[-1] for node in branch]
+        for connections in genome.connections : # 2 ici
+            for connection in connections :
+                if np.random.uniform() < threshold_weight :
+                    connections[connection] += np.random.normal(loc = 0, scale = sigma_weight)
+                    if abs(connections[connection]) > self.config.max_weight_cppn :
+                        connections[connection] = np.sign(connections[connection]) * self.config.max_weight_cppn
+        for biases in genome.biases :
+            for node in biases :
+                if np.random.uniform() < threshold_bias :
+                    biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
+                    if abs(biases[node]) > self.config.max_bias_cppn :
+                        biases[node] = np.sign(biases[node]) * self.config.max_bias_cppn
+        list_of_keys = list(functions_pool.keys())
+        for functions in genome.functions :
+            for node in functions :
+                if node in output_nodes :
+                    continue
+                if np.random.uniform() < threshold_function :
+                    choice = np.random.randint(0, len(list_of_keys))
+                    new_function = functions_pool[list_of_keys[choice]]
+                    while functions[node] == new_function :
+                        choice = np.random.randint(0, len(list_of_keys))
+                        new_function = functions_pool[list_of_keys[choice]]
+                    functions[node] = new_function
+        for dominances in genome.dominances :
+            for node in dominances :
+                if np.random.uniform() < threshold_dominance :
+                    add = np.random.normal(loc = 0, scale = self.config.sigma_dominance)
+                    new = dominances[node] + add
+                    final = self._reflect(new, 0, 1)
+                    dominances[node] = copy.deepcopy(final)
+        return genome
 
 
 class HaploidOperator :
 
     def __init__(self, config) :
         self.config = config 
+        self.dominance_ties = 0
+        self.dominance_comparisons = 0
+
+    def reset_dominance_counters(self) :
+        self.dominance_ties = 0
+        self.dominance_comparisons = 0
 
     def nodes_by_layer(self, shape_of_cppn) : 
         node = 0 
@@ -930,6 +1112,36 @@ class HaploidOperator :
             previous_layer = current_layer
         return connections, biases, activation_functions, dominances, nodes_by_layer
 
+    def generate_uniform_first_generation_of_genome_with_modu_regu(self, nodes_by_layer, functions_pool) :
+        output_activation_function = lambda x : x
+
+        connections = {}
+        biases = {}
+        activation_functions = {}
+        dominances = {}
+
+        list_of_keys = list(functions_pool.keys())
+
+        for index_of_layer in range(len(nodes_by_layer)) :
+            if index_of_layer == 0 :
+                previous_layer = nodes_by_layer[index_of_layer]
+                continue
+            current_layer = nodes_by_layer[index_of_layer]
+            for node, previous_nodes in self._incoming_by_node(previous_layer, current_layer) :
+                for previous_node in previous_nodes :
+                    weight = self.config.range_weight * np.random.uniform(-1, 1)
+                    connections[(previous_node, node)] = weight
+                d = np.random.uniform(0, 1)
+                b = self.config.range_bias * np.random.uniform(-1, 1)
+                c = np.random.randint(0, len(list_of_keys))
+                act_function = functions_pool[list_of_keys[c]]
+                biases[node] = b
+                activation_functions[node] = act_function if index_of_layer != len(nodes_by_layer) - 1 else output_activation_function
+                dominances[node] = d
+            previous_layer = current_layer
+        return connections, biases, activation_functions, dominances, nodes_by_layer
+
+
 
     def generate_first_generation_of_genome_with_modu_regu_0_init(self, nodes_by_layer, functions_pool) :
         output_activation_function = lambda x : x
@@ -1002,6 +1214,48 @@ class HaploidOperator :
                         for previous_node in previous_nodes :
                             connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
 
+            previous_layer = current_layer
+
+        nodes = copy.deepcopy(haploid.nodes)
+
+        return connections, biases, functions, dominances, nodes
+    
+    def uniform_crossover_with_modu_regu(self, haploid, other_haploid) :
+
+        connections = {}
+        biases = {}
+        functions = {}
+        dominances = {}
+
+        for index_of_layer in range(len(haploid.nodes)) :
+            if index_of_layer == 0 :
+                previous_layer = haploid.nodes[index_of_layer]
+                continue
+
+            current_layer = haploid.nodes[index_of_layer]
+
+            for node, previous_nodes in self._incoming_by_node(previous_layer, current_layer) :
+                self.dominance_comparisons += 1
+                if haploid.dominances[node] > other_haploid.dominances[node] :
+                    biases[node] = copy.deepcopy(haploid.biases[node])
+                    functions[node] = copy.deepcopy(haploid.functions[node])
+                    dominances[node] = copy.deepcopy(haploid.dominances[node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
+                elif haploid.dominances[node] < other_haploid.dominances[node] :
+                    biases[node] = copy.deepcopy(other_haploid.biases[node])
+                    functions[node] = copy.deepcopy(other_haploid.functions[node])
+                    dominances[node] = copy.deepcopy(other_haploid.dominances[node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
+                else :
+                    # always choose first ind 
+                    self.dominance_ties += 1
+                    biases[node] = copy.deepcopy(haploid.biases[node])
+                    functions[node] = copy.deepcopy(haploid.functions[node])
+                    dominances[node] = copy.deepcopy(haploid.dominances[node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
             previous_layer = current_layer
 
         nodes = copy.deepcopy(haploid.nodes)
@@ -1090,12 +1344,47 @@ class HaploidOperator :
 
         return genome
 
+    def _reflect(self, value, low, high) :
+        while value < low or value > high :
+            if value < low :
+                value = low + (low - value)
+            if value > high :
+                value = high - (value - high)
+        return value
+    
+    def mutate_uniform_with_modu_regu(self, genome, sigma_weight, sigma_bias, threshold_weight, threshold_bias, threshold_function, threshold_dominance, functions_pool) :
+        output_nodes = [node for branch in genome.nodes[-1] for node in branch]
 
+        for node in genome.connections :
+            if np.random.uniform() < threshold_weight :
+                genome.connections[node] += np.random.normal(loc = 0, scale = sigma_weight)
+                if abs(genome.connections[node]) > self.config.max_weight_cppn :
+                    genome.connections[node] = np.sign(genome.connections[node]) * self.config.max_weight_cppn
 
+        for node in genome.biases :
+            if np.random.uniform() < threshold_bias :
+                genome.biases[node] += np.random.normal(loc = 0, scale = sigma_bias)
+                if abs(genome.biases[node]) > self.config.max_bias_cppn :
+                    genome.biases[node] = np.sign(genome.biases[node]) * self.config.max_bias_cppn
 
+        list_of_keys = list(functions_pool.keys())
+        for node in genome.functions :
+            if node in output_nodes :
+                continue
+            if np.random.uniform() < threshold_function :
+                choice = np.random.randint(0, len(list_of_keys))
+                new_function = functions_pool[list_of_keys[choice]]
+                while genome.functions[node] == new_function :
+                    choice = np.random.randint(0, len(list_of_keys))
+                    new_function = functions_pool[list_of_keys[choice]]
+                genome.functions[node] = new_function
 
-
-
-                
+        for node in genome.dominances :
+            if np.random.uniform() < threshold_dominance :
+                add = np.random.normal(loc = 0, scale = self.config.sigma_dominance)
+                final = self._reflect(genome.dominances[node] + add, 0, 1)
+                genome.dominances[node] = copy.deepcopy(final)
+        return genome
+    
 
 

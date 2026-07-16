@@ -22,11 +22,11 @@ from tools.substrate import SubstrateBuilder
 from tools.distance import DistanceTool
 
 
-from systems.build_system import Both0initModularBuildSystem
-from systems.phenotype_system import BothEnvModular2WiBiPhenotypeSystem
+from systems.build_system import BothUniformModularBuildSystem
+from systems.phenotype_system import BothUniformEnvModular2WiBiPhenotypeSystem
 from systems.evaluation_system import BothEnvEvaluationSystem
 from systems.save_gen_system import BothSaveGenSystem
-from systems.reproduction_system import BothMeiosisModularReproductionSystem
+from systems.reproduction_system import BothUniformMeiosisModularReproductionSystem
 from systems.save_system import BothSaveSystem
 
 # with changing environment and for several exp or not, on substrate 5d this time and with random choose if tie in dominance 
@@ -76,11 +76,11 @@ def main() :
 
             genome_operator = GenomeOperator(config)
 
-            build_system = Both0initModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
-            phenotype_system = BothEnvModular2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome, type_env)
+            build_system = BothUniformModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
+            phenotype_system = BothUniformEnvModular2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome, type_env)
             evaluation_system = BothEnvEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome, type_env)
             save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
-            reproduction_system = BothMeiosisModularReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
+            reproduction_system = BothUniformMeiosisModularReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
             save_system = BothSaveSystem(config, results_manager, type_genome)
 
             
@@ -97,6 +97,7 @@ def main() :
                 phenotype_system.switched = (new_env != phenotype_system.type_env)
                 phenotype_system.type_env = new_env
                 evaluation_system.type_env = new_env
+                reproduction_system.type_env = new_env
 
                 if gen == 1 : 
                     results_manager.begin_both_env_txt_file(world.all_systems, type_genome, gen)
@@ -123,11 +124,11 @@ def main() :
 
             genome_operator = HaploidOperator(config)
 
-            build_system = Both0initModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
-            phenotype_system = BothEnvModular2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome, type_env)
+            build_system = BothUniformModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
+            phenotype_system = BothUniformEnvModular2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome, type_env)
             evaluation_system = BothEnvEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome, type_env)
             save_gen_system = BothSaveGenSystem(config, results_manager, type_genome)
-            reproduction_system = BothMeiosisModularReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
+            reproduction_system = BothUniformMeiosisModularReproductionSystem(config, genome_operator, entity_manager, function_pool, results_manager, type_genome)
             save_system = BothSaveSystem(config, results_manager, type_genome)
 
             world.add_builder_system(build_system)
@@ -144,6 +145,7 @@ def main() :
                 phenotype_system.switched = (new_env != phenotype_system.type_env)
                 phenotype_system.type_env = new_env
                 evaluation_system.type_env = new_env
+                reproduction_system.type_env = new_env
 
                 if gen == 1 : 
                     results_manager.begin_both_env_txt_file(world.all_systems, type_genome, gen)

@@ -341,6 +341,23 @@ class ResultsManager :
         results += '\n'
         self._log_both(results, type_genome)
 
+    def both_dominance_ties(self, ties, total, generation, type_genome, type_env, switched) :
+        percent = 100 * ties / total if total > 0 else 0.0
+        result = '----- Dominance equality of this generation -----\n\n'
+        result += f'Number of nodes where the two dominances were exactly equal : {ties} out of {total}\n'
+        result += f'IE the else branch was taken {percent:.3f} % of the time.\n'
+        result += 'A high percentage means the two dominances are copies of each other, ie dominance is not deciding anything here.\n'
+        result += '\n'
+        self._log_both(result, type_genome)
+
+        if self.save == True :
+            analysis_path = os.path.join(self.abs_path_results, type_genome, 'txt', 'dominance_analysis')
+            is_new = not os.path.exists(analysis_path)
+            with open(analysis_path, 'a') as f :
+                if is_new :
+                    f.write('gen,type_env,switched,ties,total,percent\n')
+                f.write('{},{},{},{},{},{:.6f}\n'.format(generation, type_env, switched, ties, total, percent))
+
 
     def loader(self) : 
         path = input('From which folder do you want to get the results : ')
