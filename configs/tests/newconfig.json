@@ -28,7 +28,7 @@
     "generations" : 750, 
     "population" : 128, 
     "number_of_winner" : 1, 
-    "number_in_tournament" : 2, 
+    "number_in_tournament" : 5, 
     "number_of_elites" : 1, 
 
     "shape_of_cppn" :  [[11], [5], [3, 3], [1, 1]], 
