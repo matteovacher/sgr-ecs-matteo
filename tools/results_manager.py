@@ -358,6 +358,14 @@ class ResultsManager :
                     f.write('gen,type_env,switched,ties,total,percent\n')
                 f.write('{},{},{},{},{},{:.6f}\n'.format(generation, type_env, switched, ties, total, percent))
 
+    def both_invalid(self, invalid, generation, type_genome, type_env) : 
+        if self.save == True :
+            analysis_path = os.path.join(self.abs_path_results, type_genome, 'txt', 'invalid_analysis')
+            is_new = not os.path.exists(analysis_path)
+            with open(analysis_path, 'a') as f :
+                if is_new :
+                    f.write('gen,type_genome,type_env,invalid\n')
+                f.write('{},{},{},{}\n'.format(generation, type_genome, type_env, invalid))
 
     def loader(self) : 
         path = input('From which folder do you want to get the results : ')

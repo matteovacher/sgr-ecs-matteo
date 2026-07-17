@@ -350,6 +350,7 @@ class BothEnvEvaluationSystem() :
             generation_id = self.entity_manager.create_entity()
             registry.add_statistic(generation_id, self.generation, average, sigma, best_id, fitness_best, average_best, sigma_best)
             
+            self.results_manager.both_invalid(invalid, self.generation, self.type_genome, self.type_env)
 
             self.generation += 1
         
@@ -407,6 +408,7 @@ class BothEnvEvaluationSystem() :
             generation_id = self.entity_manager.create_entity()
             registry.add_statistic(generation_id, self.generation, average, sigma, best_id, fitness_best, average_best, sigma_best)
             
+            self.results_manager.both_invalid(invalid, self.generation, self.type_genome, self.type_env)
             self.generation += 1   
         
         else : 
