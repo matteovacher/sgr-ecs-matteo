@@ -986,14 +986,26 @@ class BothUniformMeiosisModularReproductionSystem :
             max_population = self.config.population 
             number_of_elites = self.config.number_of_elites 
 
+
+
             parents_ids = []
             children_entity_ids = []
             elitism = []
 
-            if len(entity_ids) < number_in_tournament :
-                raise RuntimeError('not enough valid individual to fit in the tournament. Please change HyperParameters or just the program.')
+            collapsed = len(entity_ids) < number_in_tournament
+            if collapsed : 
+                number_valid = len(entity_ids)
+                fitness_of = {id : registry.get_fitness(id).fitness for id in entity_ids}
+                floor = min(fitness_of.values()) - 10.0 if fitness_of else 0.0
+                entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id)]
+                for id in entity_ids :
+                    if id not in fitness_of :
+                        fitness_of[id] = floor
+                self.results_manager.both_collapse(number_valid, len(entity_ids), floor, self.type_genome)
+            else :
+                fitness_of = {id : registry.get_fitness(id).fitness for id in entity_ids}
 
-            fitnesses = np.array([registry.get_fitness(id).fitness for id in entity_ids ])
+            fitnesses = np.array([fitness_of[id] for id in entity_ids ])
             ids_of_sorted = np.argsort(fitnesses)
             for taken in range(number_of_elites) : 
                 id = ids_of_sorted[len(entity_ids) - 1 - taken]
@@ -1022,7 +1034,8 @@ class BothUniformMeiosisModularReproductionSystem :
                     registry.add_age(child_id, age)
 
                 tournament_ids = rd.sample(entity_ids, number_in_tournament)
-                fitnesses = np.array([registry.get_fitness(id).fitness for id in tournament_ids])
+                fitnesses = np.array([fitness_of[id] for id in tournament_ids])
+
                 ids_of_sorted = np.argsort(fitnesses)
                 taken = 0 
                 
@@ -1060,10 +1073,22 @@ class BothUniformMeiosisModularReproductionSystem :
             children_entity_ids = []
             elitism = []
 
-            if len(entity_ids) < number_in_tournament :
-                raise RuntimeError('not enough valid individual to fit in the tournament. Please change HyperParameters or just the program.')
+            collapsed = len(entity_ids) < number_in_tournament
+            if collapsed :
+                number_valid = len(entity_ids)
+                fitness_of = {id : registry.get_fitness(id).fitness for id in entity_ids}
+                floor = min(fitness_of.values()) - 10.0 if fitness_of else 0.0
+                entity_ids = [id for id in registry.get_all_id_with_haploid() if self.entity_manager.is_alive(id)]
+                for id in entity_ids :
+                    if id not in fitness_of :
+                        fitness_of[id] = floor
+                self.results_manager.both_collapse(number_valid, len(entity_ids), floor, self.type_genome)
+            else :
+                fitness_of = {id : registry.get_fitness(id).fitness for id in entity_ids}
 
-            fitnesses = np.array([registry.get_fitness(id).fitness for id in entity_ids])
+            fitnesses = np.array([fitness_of[id] for id in entity_ids])
+
+
             ids_of_sorted = np.argsort(fitnesses)
             for taken in range(number_of_elites) : 
                 id = ids_of_sorted[len(entity_ids) - 1 - taken]
@@ -1094,7 +1119,8 @@ class BothUniformMeiosisModularReproductionSystem :
                     registry.add_age(child_id, age)
 
                 tournament_ids = rd.sample(entity_ids, number_in_tournament)
-                fitnesses = np.array([registry.get_fitness(id).fitness for id in tournament_ids])
+                fitnesses = np.array([fitness_of[id] for id in tournament_ids])
+
                 ids_of_sorted = np.argsort(fitnesses)
                 taken = 0 
                 
