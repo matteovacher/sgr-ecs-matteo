@@ -1236,26 +1236,39 @@ class HaploidOperator :
 
             for node, previous_nodes in self._incoming_by_node(previous_layer, current_layer) :
                 self.dominance_comparisons += 1
-                if haploid.dominances[node] > other_haploid.dominances[node] :
+                choice = np.random.randint(0, 2)
+                if choice == 0 :
                     biases[node] = copy.deepcopy(haploid.biases[node])
                     functions[node] = copy.deepcopy(haploid.functions[node])
                     dominances[node] = copy.deepcopy(haploid.dominances[node])
                     for previous_node in previous_nodes :
                         connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
-                elif haploid.dominances[node] < other_haploid.dominances[node] :
+                elif choice == 1 :
                     biases[node] = copy.deepcopy(other_haploid.biases[node])
                     functions[node] = copy.deepcopy(other_haploid.functions[node])
                     dominances[node] = copy.deepcopy(other_haploid.dominances[node])
                     for previous_node in previous_nodes :
                         connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
-                else :
-                    # always choose first ind 
-                    self.dominance_ties += 1
-                    biases[node] = copy.deepcopy(haploid.biases[node])
-                    functions[node] = copy.deepcopy(haploid.functions[node])
-                    dominances[node] = copy.deepcopy(haploid.dominances[node])
-                    for previous_node in previous_nodes :
-                        connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
+                # if haploid.dominances[node] > other_haploid.dominances[node] :
+                #     biases[node] = copy.deepcopy(haploid.biases[node])
+                #     functions[node] = copy.deepcopy(haploid.functions[node])
+                #     dominances[node] = copy.deepcopy(haploid.dominances[node])
+                #     for previous_node in previous_nodes :
+                #         connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
+                # elif haploid.dominances[node] < other_haploid.dominances[node] :
+                #     biases[node] = copy.deepcopy(other_haploid.biases[node])
+                #     functions[node] = copy.deepcopy(other_haploid.functions[node])
+                #     dominances[node] = copy.deepcopy(other_haploid.dominances[node])
+                #     for previous_node in previous_nodes :
+                #         connections[(previous_node, node)] = copy.deepcopy(other_haploid.connections[(previous_node, node)])
+                # else :
+                #     # always choose first ind 
+                #     self.dominance_ties += 1
+                #     biases[node] = copy.deepcopy(haploid.biases[node])
+                #     functions[node] = copy.deepcopy(haploid.functions[node])
+                #     dominances[node] = copy.deepcopy(haploid.dominances[node])
+                #     for previous_node in previous_nodes :
+                #         connections[(previous_node, node)] = copy.deepcopy(haploid.connections[(previous_node, node)])
             previous_layer = current_layer
 
         nodes = copy.deepcopy(haploid.nodes)
