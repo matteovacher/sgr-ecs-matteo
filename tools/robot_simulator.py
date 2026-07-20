@@ -73,32 +73,35 @@ class RobotSimulator:
     
     def simulate_mode_env(self, id, robot, controller, n_steps, controller_manager, type_env) : 
         env = self._get_env_mode_env(robot, type_env) 
-        reward = 0  
+        try : 
+            reward = 0  
 
-        observation, _ = env.reset()
+            observation, _ = env.reset()
 
-        actuators = env.get_actuator_indices("robot")
-        inputs_size = math.ceil(math.sqrt(len(observation)))
+            actuators = env.get_actuator_indices("robot")
+            inputs_size = math.ceil(math.sqrt(len(observation)))
 
-        finished = False 
+            finished = False 
 
-        for _ in range (n_steps) : 
-            observation.resize(inputs_size**2)
-            all_actions = controller_manager.activate(controller, observation)
-            action = np.array([all_actions[i] for i in actuators])
-            observation, step_reward, terminated, truncated, _ = env.step(action)
+            for _ in range (n_steps) : 
+                observation.resize(inputs_size**2)
+                all_actions = controller_manager.activate(controller, observation)
+                action = np.array([all_actions[i] for i in actuators])
+                observation, step_reward, terminated, truncated, _ = env.step(action)
 
-            reward += step_reward
+                reward += step_reward
 
-            done = terminated or truncated 
+                done = terminated or truncated 
 
-            if done : 
-                finished = True 
-                break 
+                if done : 
+                    finished = True 
+                    break 
+            return id, reward, finished
 
-        env.close() 
-        del env 
-        return id, reward, finished
+        finally : 
+            env.close()
+            del env
+    
 
     def _get_env_render(self, robot) : 
         print('----- Here is the simulated robot -----\n')
@@ -143,6 +146,7 @@ class RobotSimulator:
         return images, fitness 
     
     def simulate_render_mode_env(self, robot, controller, controller_manager, n_steps, type_env) : 
+        
         env = self._get_env_render_mode_env(robot, type_env)
         fitness = 0
         observation, _ = env.reset()

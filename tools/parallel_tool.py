@@ -60,9 +60,10 @@ class ParallelTool :
         results = []
         for entity_id, ar in ars : 
             try : 
-                results.append(ar.get(timeout=30))     # 30 s max par robot
+                results.append(ar.get(timeout=120))     # 120 s max par robot
             except Exception : 
                 results.append((entity_id, -1000, True))
+        for p in pool._pool :
+            p.kill()
         pool.terminate()
-        pool.join()
         return results
