@@ -58,6 +58,7 @@ class ParallelTool :
         pool = multiprocess.Pool(self.cpus)
         ars = [(args[0], pool.apply_async(function, args)) for args in chunk]
         results = []
+        timed_out = False
         for entity_id, ar in ars : 
             try : 
                 results.append(ar.get(timeout=25))     # 120 s max par robot
