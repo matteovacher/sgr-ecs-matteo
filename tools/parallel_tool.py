@@ -3,6 +3,7 @@ from pathos.multiprocessing import ProcessPool
 import dill
 import multiprocess 
 import errno 
+import time
 
 class ParallelTool :
 
