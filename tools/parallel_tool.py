@@ -6,8 +6,9 @@ import errno
 
 class ParallelTool :
 
-    def __init__(self, config) : 
+    def __init__(self, config) :
         self.cpus = config.cpus
+        self.timeout = getattr(config, "timeout", 25)
 
 
     def run(self, function, chunk) : 
@@ -54,19 +55,30 @@ class ParallelTool :
     #     return results_formatted 
 
 
-    def _process_parallel(self, function, chunk) : 
+    def _process_parallel(self, function, chunk) :
+
         pool = multiprocess.Pool(self.cpus)
-        ars = [(args[0], pool.apply_async(function, args)) for args in chunk]
-        results = []
-        timed_out = False
-        for entity_id, ar in ars : 
-            try : 
-                results.append(ar.get(timeout=25))     # 120 s max par robot
-            except Exception : 
-                timed_out = True
-                results.append((entity_id, -1000, True))
-        if timed_out :
-            for p in pool._pool :
-                p.kill()
-        pool.terminate()
-        return results
+        try :
+            ars = [(args[0], pool.apply_async(function, args)) for args in chunk]
+
+            # budget global : nb de vagues x timeout, au lieu de 25 s par item
+            batches = math.ceil(len(chunk) / self.cpus)
+            deadline = time.monotonic() + self.timeout * batches
+
+            results = []
+
+            for entity_id, ar in ars :
+                # une fois la deadline passee on n'attend plus, mais timeout=0
+                # ramasse quand meme les resultats deja prets
+                remaining = max(0, deadline - time.monotonic())
+
+                try :
+                    results.append(ar.get(timeout=remaining))
+                except Exception :
+                    results.append((entity_id, -1000, True))
+
+            return results
+
+        finally :
+            pool.terminate()
+            pool.join()

@@ -4,6 +4,9 @@ import json
 import dill 
 import time 
 import copy 
+import numpy as np 
+
+from components import BodyNetworkComponent
 
 class ResultsManager :
 
@@ -449,11 +452,11 @@ class ResultsManager :
     
     
     def ask_action(self) :
-        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [genealogy] / [render genealogy] / [save family] / [save individual] / [distance] / [anything else to quit] \n \t')
+        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [genealogy] / [render genealogy] / [save family] / [save individual] / [distance] / [compare] / [anything else to quit] \n \t')
         return action
     
     def ask_haploid_action(self) :
-        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [haploid genealogy] / [render haploid genealogy] / [save haploid family] / [save individual] / [distance] / [anything else to quit] \n \t')
+        action = input('Do you want the body of a given generation ? or a single body ? or to render a certain individual ? or to explore the genealogy of a certain individual ? or to render a whole genealogy ? or to save images of a whole family ?  or to save the image of an individual ? or the distance between two individuals ?\n \t [bodies] / [body] / [render] / [haploid genealogy] / [render haploid genealogy] / [save haploid family] / [save individual] / [distance] / [compare] / [anything else to quit] \n \t')
         return action
     
     def ask_both_action(self) : 
@@ -1104,7 +1107,123 @@ class ResultsManager :
         else : 
             return True, 0, 0, 0
         
+    def compare_now_and_before(self, distance_tool, type_genome, config, network_manager,
+                           substrate_builder, phenotype_builder, robot_generator) :
+        generation = input("Here you'll compare the top 5 of this gen to the top 10 of the other before switch, so that if we switch the input to the body ann, we can see if the solution is memorized or generalized ?\n Please generation : ")
+        generation = int(generation)
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+    
+
+        self.pkl_dir = os.path.join(self.results_dir, type_genome, 'pkl')
+
+        gen_before =  (generation // config.switch) * config.switch - 1
+        gen_before_before = ((generation // config.switch) - 1) * config.switch - 1
+        env_now    = 0 if (generation // config.switch) % 2 == 0 else 1
+        env_before = 1 - env_now
+
+        def load(gen, name) :
+            with open(os.path.join(self.pkl_dir, '{}_{}.pkl'.format(gen, name)), 'rb') as f :
+                return dill.load(f)
+        
+        cppn_now, fit_now, body_now = load(generation, 'cppn_registry'), load(generation, 'fitness_registry'), load(generation, 'body_registry')
+        fit_before, body_before = load(gen_before, 'fitness_registry'), load(gen_before, 'body_registry')
+        fit_before_before, body_before_before = load(gen_before_before, 'fitness_registry'), load(gen_before_before, 'body_registry')
+
+        def tops(fit_reg, n) :
+            keys = []
+            for k in fit_reg.keys() :
+                if fit_reg[k].fitness > -1000 :
+                    keys.append(k)
+
+            fitnesses = np.array([fit_reg[k].fitness for k in keys])
+            order = np.argsort(fitnesses)
+
+            bests = []
+            for taken in range(min(n, len(keys))) :
+                index = order[len(keys) - 1 - taken]
+                bests.append(keys[index])
+            return bests
+
+        top5before = tops(fit_before, 5)
+        top5beforebefore = tops(fit_before_before, 5)
+        Zs = [body_before[k].body for k in top5before]
+        Ws = [body_before_before[k].body for k in top5beforebefore] 
+    
+        Xs = []
+        Ys = []
+        substrate = substrate_builder.shape_into_coordinates(substrate_builder.extract_former_body_network_shape(config))
+        for key in tops(fit_now, 5) :
+            node_evals, in_nodes, out_nodes = phenotype_builder.create_phenotype_network_without_bias_2_outputs(cppn_now[key], network_manager, substrate, np.tanh, np.tanh, sum, config.response, config.max_weight, config.max_bias, type_output = 0)
+            body_network = BodyNetworkComponent(node_evals, in_nodes, out_nodes)
+
+            X = body_now[key].body
+            Xs.append(X)
+        
+            Y = robot_generator.generate_former_robot_body_from_network_and_env(
+                body_network, network_manager, config.body_shape, env_before)
+            Ys.append(Y)
+
+            X_check = robot_generator.generate_former_robot_body_from_network_and_env(
+                body_network, network_manager, config.body_shape, env_now)
+            print(np.array_equal(X, X_check))
+
+        Xs = np.array(Xs)
+        Ys = np.array(Ys)
+        Zs = np.array(Zs)
+        Ws = np.array(Ws)
+        
+        def distances_between(group1, group2) :
+            matrice = []
+            for body1 in group1 :
+                ligne = []
+                for body2 in group2 :
+                    ligne.append(distance_tool.phenotypic_body_distance(body1, body2)[1])
+                matrice.append(ligne)
+            return np.array(matrice)
+
+        dXsbeforebefore = distances_between(Xs, Ws)
+        dYsbefore = distances_between(Ys, Zs)
+        refWs = distances_between(Ws, Ws)
+        refZs = distances_between(Zs, Zs)
+        
+        dXsYs = []
+        for i in range(len(Xs)) :
+            dXsYs.append(distance_tool.phenotypic_body_distance(Xs[i], Ys[i])[1])
+
+        print('\n ----- Distances ----- \n')
+        for i in range(len(Xs)) :
+            print('Individual {} : its two bodies are at {} from each other'.format(i, round(dXsYs[i], 3)))
+            print('Its body of env {} is at {} of the best bodies of gen {}'.format(env_now, round(dXsbeforebefore[i].min(), 3), gen_before_before))
+            print('This is interessant : Its body of env {} is at {} of the best bodies of gen {} \n'.format(env_before, round(dYsbefore[i].min(), 3), gen_before))
+
+        print('\n ----- Bodies ----- \n')
+        for i in range(len(Xs)) :
+            print('Individual {} in env {} : \n'.format(i, env_now))
+            print(Xs[i])
+            print('The same one with the input of env {} : \n'.format(env_before))
+            print(Ys[i])
+            print('\n')
+        
+        print('\n ----- Best bodies of gen {} (env {}) ----- \n'.format(gen_before, env_before))
+        for Z in Zs :
+            print(Z)
+            print('\n')
+
+        print('\n ----- Best bodies of gen {} (env {}) ----- \n'.format(gen_before_before, env_now))
+        for W in Ws :
+            print(W)
+            print('\n')
+
+        if exit == "y" :
+            return True
+        else : 
+            return False
+
+
+
             
+        
+
         
     def print_distance(self, distance_tool) :
         generation1 = input('Please indicate the generation of the first individual : ')

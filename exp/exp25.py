@@ -326,6 +326,10 @@ def render() :
         elif action == 'distance' :
             exit = results_manager.print_both_distance(distance_tool, type_genome)
         
+        elif action == 'compare' :
+            exit = results_manager.compare_now_and_before(distance_tool, type_genome, config,
+                    network_manager, SubstrateBuilder(config), PhenotypeBuilder(), RobotGenerator())
+
         else : 
             exit = True 
         
