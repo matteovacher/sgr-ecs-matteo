@@ -1109,8 +1109,10 @@ class ResultsManager :
         
     def compare_now_and_before(self, distance_tool, type_genome, config, network_manager,
                            substrate_builder, phenotype_builder, robot_generator) :
-        generation = input("Here you'll compare the top 5 of this gen to the top 10 of the other before switch, so that if we switch the input to the body ann, we can see if the solution is memorized or generalized ?\n Please generation : ")
+        generation = input("Here you'll compare the top (you decide) of this gen to the top (same here as before) of the other before switch, so that if we switch the input to the body ann, we can see if the solution is memorized or generalized ?\n Please generation : ")
+        number = input(" Please indicate the number of the top you want to compare : ")
         generation = int(generation)
+        number = int(number)
         exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
     
 
@@ -1144,15 +1146,15 @@ class ResultsManager :
                 bests.append(keys[index])
             return bests
 
-        top5before = tops(fit_before, 5)
-        top5beforebefore = tops(fit_before_before, 5)
+        top5before = tops(fit_before, number)
+        top5beforebefore = tops(fit_before_before, number)
         Zs = [body_before[k].body for k in top5before]
         Ws = [body_before_before[k].body for k in top5beforebefore] 
     
         Xs = []
         Ys = []
         substrate = substrate_builder.shape_into_coordinates(substrate_builder.extract_former_body_network_shape(config))
-        for key in tops(fit_now, 5) :
+        for key in tops(fit_now, number) :
             node_evals, in_nodes, out_nodes = phenotype_builder.create_phenotype_network_without_bias_2_outputs(cppn_now[key], network_manager, substrate, np.tanh, np.tanh, sum, config.response, config.max_weight, config.max_bias, type_output = 0)
             body_network = BodyNetworkComponent(node_evals, in_nodes, out_nodes)
 
@@ -1192,9 +1194,9 @@ class ResultsManager :
 
         print('\n ----- Distances ----- \n')
         for i in range(len(Xs)) :
-            print('Individual {} : its two bodies are at {} from each other'.format(i, round(dXsYs[i], 3)))
+            print('Individual {} : its two bodies are at {} from each other ie this gen vs gen before with current genome'.format(i, round(dXsYs[i], 3)))
             print('Its body of env {} is at {} of the best bodies of gen {}'.format(env_now, round(dXsbeforebefore[i].min(), 3), gen_before_before))
-            print('This is interessant : Its body of env {} is at {} of the best bodies of gen {} \n'.format(env_before, round(dYsbefore[i].min(), 3), gen_before))
+            print('This is interessant : Its body of env {} is at {} of the best bodies of gen {} ie distance between the new created body and the body of generation bedore\n'.format(env_before, round(dYsbefore[i].min(), 3), gen_before))
 
         print('\n ----- Bodies ----- \n')
         for i in range(len(Xs)) :
@@ -1218,7 +1220,6 @@ class ResultsManager :
             return True
         else : 
             return False
-
 
 
             

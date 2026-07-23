@@ -24,8 +24,8 @@
     "threshold_dominance" : 0.07,
     
 
-    "switch" : 25, 
-    "generations" : 700, 
+    "switch" : 20, 
+    "generations" : 600, 
     "population" : 128, 
     "number_of_winner" : 1, 
     "number_in_tournament" : 2, 
@@ -35,11 +35,11 @@
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : [1000, 1000], 
+    "n_steps" : [300, 1000], 
     "number_of_reported_individuals" : 40,
 
     "cpus" : 30, 
 
-    "env_name" : ["CaveCrawler-v0", "Pusher-v0"]
+    "env_name" : ["Thrower-v0", "Pusher-v0"]
 
 }
