@@ -330,6 +330,41 @@ def render() :
             exit = results_manager.compare_now_and_before(distance_tool, type_genome, config,
                     network_manager, SubstrateBuilder(config), PhenotypeBuilder(), RobotGenerator())
 
+        elif action == 'compare and save' : 
+            exit, Xs, Ys, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before = results_manager.compare_render_now_and_before(distance_tool, type_genome, config,
+                    network_manager, SubstrateBuilder(config), PhenotypeBuilder(), RobotGenerator())
+
+            images_dir = os.path.join(results_manager.results_dir, type_genome, 'images')
+            os.makedirs(images_dir, exist_ok=True)
+            os.makedirs(os.path.join(images_dir, 'now'), exist_ok=True)
+            os.makedirs(os.path.join(images_dir, 'NEW_before'), exist_ok=True)
+            os.makedirs(os.path.join(images_dir, 'double_before'), exist_ok=True)
+            os.makedirs(os.path.join(images_dir, 'before'), exist_ok=True)
+
+            print('\n----- Saving the Images -----\n')
+
+            for i in range(len(Xs)) :
+                image_path = os.path.join(images_dir, 'now', 'gen_{}.png'.format(generation))
+                image = robot_simulator.simulate_render_image_mode_env(Xs[i], env_now)
+                io.imwrite(image_path, image)
+            
+            for i in range(len(Ys)) :
+                image_path = os.path.join(images_dir, 'NEW_before', 'gen_{}.png'.format(gen_before))
+                image = robot_simulator.simulate_render_image_mode_env(Ys[i], env_before)
+                io.imwrite(image_path, image)
+
+            for i in range(len(Ws)) :
+                image_path = os.path.join(images_dir, 'double_before', 'gen_{}.png'.format(gen_before_before))
+                image = robot_simulator.simulate_render_image_mode_env(Ws[i], env_now)
+                io.imwrite(image_path, image)
+
+            for i in range(len(Zs)) :
+                image_path = os.path.join(images_dir, 'before', 'gen_{}.png'.format(gen_before_before))
+                image = robot_simulator.simulate_render_image_mode_env(Zs[i], env_before)
+                io.imwrite(image_path, image)
+
+            print('\n----- Saved Successfully -----\n')
+
         else : 
             exit = True 
         

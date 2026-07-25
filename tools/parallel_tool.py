@@ -58,7 +58,7 @@ class ParallelTool :
 
     def _process_parallel(self, function, chunk) :
 
-        pool = multiprocess.Pool(self.cpus)
+        pool = multiprocess.Pool(self.cpus, maxtasksperchild=1)
         try :
             ars = [(args[0], pool.apply_async(function, args)) for args in chunk]
 
