@@ -1,6 +1,6 @@
 {
 
-    "number_of_exp" : 2, 
+    "number_of_exp" : 5, 
     "number_of_config" : 1, 
     "threshold_var" : 0.15, 
 
@@ -35,11 +35,11 @@
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : [300, 1000], 
+    "n_steps" : [800, 1000], 
     "number_of_reported_individuals" : 40,
 
     "cpus" : 30, 
 
-    "env_name" : ["Thrower-v0", "Pusher-v0"]
+    "env_name" : ["BridgeWalker-v0", "Pusher-v0"]
 
 }
