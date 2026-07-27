@@ -36,7 +36,15 @@ class RobotSimulator:
         env.close()
         del env 
         return len(observation)
-    
+
+    def safe_observation_size_mode_env(self, id, robot, type_env) :
+        env = self._get_env_mode_env(robot, type_env)
+        try :
+            observation, _ = env.reset()
+            return id, len(observation), True
+        finally :
+            env.close()
+            del env
 
     def simulate(self, id, robot, controller, n_steps, controller_manager) :
         try :

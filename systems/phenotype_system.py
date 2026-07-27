@@ -1,5 +1,6 @@
 import math 
 import numpy as np
+from tools.parallel_tool import ParallelTool
 
 class PhenotypeSystem :
 
@@ -1403,9 +1404,10 @@ class BothUniformEnvModular2WiBiPhenotypeSystem :
         self.type_genome = type_genome 
         self.type_env = type_env
         self.switched = False
+        self.parallel_tool = ParallelTool(config)
 
     def process(self, registry) :
-
+        
         if self.type_genome == 'diploid' :
             self.results_manager.start_both_env_generation(self.generation, self.config, self.type_genome, self.type_env)
             current_gen = self.generation
@@ -1418,7 +1420,8 @@ class BothUniformEnvModular2WiBiPhenotypeSystem :
             else : 
                 entity_ids = [id for id in registry.get_all_id_with_genome() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) == False]
 
-
+            valid_ids = []
+            robots = []
             for entity_id in entity_ids : 
                 genome = registry.get_genome(entity_id)
                 connections, bias, functions = self.genome_operator.uniform_dominance_with_modu_regu(genome)
@@ -1446,8 +1449,27 @@ class BothUniformEnvModular2WiBiPhenotypeSystem :
                 connections = self.robot_generator.get_full_connectivity(robot_grid)
                 registry.add_body(entity_id, robot_grid, connections)
 
-                out_act_func = lambda x : 0.5*np.tanh(x) + 1.1
-                observation_size = self.robot_simulator.get_observation_size_mode_env(robot_grid, self.type_env)
+                valid_ids.append(entity_id)
+                robots.append(robot_grid)
+
+            size_of = {}
+            if robots :
+                chunk = [(vid, robot, self.type_env) for vid, robot in zip(valid_ids, robots)]
+                results = self.parallel_tool.run(self.robot_simulator.safe_observation_size_mode_env, chunk)
+                size_of = {rid : size for (rid, size, ok) in results}
+
+
+            act_func = np.tanh
+            out_act_func = lambda x : 0.5*np.tanh(x) + 1.1
+            for entity_id in valid_ids :
+                observation_size = size_of.get(entity_id, -1000)
+                if observation_size <= 0 : 
+                    fitness, finished  = -1000, True
+                    registry.add_fitness(entity_id, fitness, finished)
+                    if registry.has_controller_network(entity_id) :
+                        registry.controller_network_registry.pop(entity_id)
+                    continue
+                cppn = registry.get_cppn(entity_id)
                 grid_input_size = math.ceil(math.sqrt(observation_size))
                 controller_substrate_shape = self.substrate_builder.extract_former_controller_network_shape(grid_input_size, self.config)
                 controller_substrate = self.substrate_builder.shape_into_coordinates(controller_substrate_shape)
@@ -1465,6 +1487,8 @@ class BothUniformEnvModular2WiBiPhenotypeSystem :
             else : 
                 entity_ids = [id for id in registry.get_all_id_with_haploid() if self.entity_manager.is_alive(id) and registry.has_controller_network(id) == False]
 
+            valid_ids = []
+            robots = []
             for entity_id in entity_ids : 
                 haploid = registry.get_haploid(entity_id)
                 node_evals, input_nodes, output_nodes = self.network_manager.create_network_with_modu_regu(haploid.nodes, haploid.connections, haploid.biases, haploid.functions, sum, response = 1)
@@ -1491,8 +1515,26 @@ class BothUniformEnvModular2WiBiPhenotypeSystem :
                 connections = self.robot_generator.get_full_connectivity(robot_grid)
                 registry.add_body(entity_id, robot_grid, connections)
 
-                out_act_func = lambda x : 0.5*np.tanh(x) + 1.1
-                observation_size = self.robot_simulator.get_observation_size_mode_env(robot_grid, self.type_env)
+                valid_ids.append(entity_id)
+                robots.append(robot_grid)
+
+            size_of = {}
+            if robots :
+                chunk = [(vid, robot, self.type_env) for vid, robot in zip(valid_ids, robots)]
+                results = self.parallel_tool.run(self.robot_simulator.safe_observation_size_mode_env, chunk)
+                size_of = {rid : size for (rid, size, ok) in results}
+
+            act_func = np.tanh
+            out_act_func = lambda x : 0.5*np.tanh(x) + 1.1
+            for entity_id in valid_ids :
+                observation_size = size_of.get(entity_id, -1000)
+                if observation_size <= 0 :   # sonde échouée/timeout → traité comme invalide
+                    fitness, finished  = -1000, True
+                    registry.add_fitness(entity_id, fitness, finished)
+                    if registry.has_controller_network(entity_id) :
+                        registry.controller_network_registry.pop(entity_id)
+                    continue
+                cppn = registry.get_cppn(entity_id)
                 grid_input_size = math.ceil(math.sqrt(observation_size))
                 controller_substrate_shape = self.substrate_builder.extract_former_controller_network_shape(grid_input_size, self.config)
                 controller_substrate = self.substrate_builder.shape_into_coordinates(controller_substrate_shape)
