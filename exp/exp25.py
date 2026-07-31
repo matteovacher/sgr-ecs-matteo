@@ -344,22 +344,22 @@ def render() :
             print('\n----- Saving the Images -----\n')
 
             for i in range(len(Xs)) :
-                image_path = os.path.join(images_dir, 'now', 'gen_{}.png'.format(generation))
+                image_path = os.path.join(images_dir, 'now', 'gen_{}_{}.png'.format(generation, i))
                 image = robot_simulator.simulate_render_image_mode_env(Xs[i], env_now)
                 io.imwrite(image_path, image)
             
             for i in range(len(Ys)) :
-                image_path = os.path.join(images_dir, 'NEW_before', 'gen_{}.png'.format(gen_before))
+                image_path = os.path.join(images_dir, 'NEW_before', 'gen_{}_{}.png'.format(gen_before, i))
                 image = robot_simulator.simulate_render_image_mode_env(Ys[i], env_before)
                 io.imwrite(image_path, image)
 
             for i in range(len(Ws)) :
-                image_path = os.path.join(images_dir, 'double_before', 'gen_{}.png'.format(gen_before_before))
+                image_path = os.path.join(images_dir, 'double_before', 'gen_{}_{}.png'.format(gen_before_before, i))
                 image = robot_simulator.simulate_render_image_mode_env(Ws[i], env_now)
                 io.imwrite(image_path, image)
 
             for i in range(len(Zs)) :
-                image_path = os.path.join(images_dir, 'before', 'gen_{}.png'.format(gen_before_before))
+                image_path = os.path.join(images_dir, 'before', 'gen_{}_{}.png'.format(gen_before, i))
                 image = robot_simulator.simulate_render_image_mode_env(Zs[i], env_before)
                 io.imwrite(image_path, image)
 

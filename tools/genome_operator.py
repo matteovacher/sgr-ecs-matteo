@@ -473,6 +473,36 @@ class GenomeOperator:
 
         return connections, bias, functions
 
+    def signal_uniform_dominance_with_modu_regu(self, genome, type_env) : 
+        connections = {}
+        bias = {}
+        functions = {}
+
+        for index_of_layer in range(len(genome.nodes)) :
+            if index_of_layer == 0 :
+                previous_layer = genome.nodes[index_of_layer]
+                continue
+
+            current_layer = genome.nodes[index_of_layer]
+
+            for node, previous_nodes in self._incoming_by_node(previous_layer, current_layer) :
+                self.dominance_comparisons += 1
+                if type_env == 0 :
+                    bias[node] = copy.deepcopy(genome.biases[0][node])
+                    functions[node] = copy.deepcopy(genome.functions[0][node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[0][(previous_node, node)])
+                elif type_env == 1 :
+                    bias[node] = copy.deepcopy(genome.biases[1][node])
+                    functions[node] = copy.deepcopy(genome.functions[1][node])
+                    for previous_node in previous_nodes :
+                        connections[(previous_node, node)] = copy.deepcopy(genome.connections[1][(previous_node, node)])
+
+            previous_layer = current_layer
+
+        return connections, bias, functions        
+
+
     def codominance(self, genome) :
         
         connections = {}
@@ -751,6 +781,145 @@ class GenomeOperator:
         nodes = copy.deepcopy(genome1.nodes)
 
         return connections, bias, functions, dominances, nodes, choice1, choice2
+
+    def meiosis_signal_crossover(self, genome1, genome2) :
+        # first determine where to make the cut in the chromosome 
+        nodes_by_layer = genome1.nodes
+        first_nodes = nodes_by_layer[1][0]
+        secondary_nodes = []
+        for index in range(2, len(nodes_by_layer)) :
+            if len(nodes_by_layer[index]) > 1 :
+                for branch in range(len(nodes_by_layer[index])) :
+                    secondary_nodes += [nodes_by_layer[index][branch][i] for i in range(len(nodes_by_layer[index][branch]))]
+            if len(nodes_by_layer[index]) == 1 :
+                secondary_nodes += [nodes_by_layer[index][0][i] for i in range(len(nodes_by_layer[index][0]))]
+    
+        connections1 = {}
+        bias1 = {}
+        functions1 = {}
+        dominances1 = {}
+
+        connections2 = {}
+        bias2 = {}
+        functions2 = {}
+        dominances2 = {}
+
+        # first chromosome 
+        choice_first = np.random.randint(0, 2)
+        if choice_first == 0 :
+            for (previous_node, node) in genome1.connections[0].keys() :
+                if node in first_nodes :
+                    connections1[(previous_node, node)] = copy.deepcopy(genome1.connections[0][(previous_node, node)])
+            for node in genome1.biases[0].keys() :
+                if node in first_nodes :
+                    bias1[node] = copy.deepcopy(genome1.biases[0][node])
+            for node in genome1.functions[0].keys() :
+                if node in first_nodes :
+                    functions1[node] = copy.deepcopy(genome1.functions[0][node])
+            for node in genome1.dominances[0].keys() :
+                if node in first_nodes : 
+                    dominances1[node] = copy.deepcopy(genome1.dominances[0][node])
+            for (previous_node, node) in genome2.connections[0].keys() :
+                if node in secondary_nodes :
+                    connections1[(previous_node, node)] = copy.deepcopy(genome2.connections[0][(previous_node, node)])
+            for node in genome2.biases[0].keys() :
+                if node in secondary_nodes :
+                    bias1[node] = copy.deepcopy(genome2.biases[0][node])
+            for node in genome2.functions[0].keys() :
+                if node in secondary_nodes :
+                    functions1[node] = copy.deepcopy(genome2.functions[0][node])
+            for node in genome2.dominances[0].keys() :
+                if node in secondary_nodes :
+                    dominances1[node] = copy.deepcopy(genome2.dominances[0][node])
+
+        elif choice_first == 1 :
+            for (previous_node, node) in genome2.connections[0].keys() :
+                if node in first_nodes :
+                    connections1[(previous_node, node)] = copy.deepcopy(genome2.connections[0][(previous_node, node)])
+            for node in genome2.biases[0].keys() :
+                if node in first_nodes :    
+                    bias1[node] = copy.deepcopy(genome2.biases[0][node])
+            for node in genome2.functions[0].keys() :
+                if node in first_nodes :
+                    functions1[node] = copy.deepcopy(genome2.functions[0][node])
+            for node in genome2.dominances[0].keys() :
+                if node in first_nodes :
+                    dominances1[node] = copy.deepcopy(genome2.dominances[0][node])
+            for (previous_node, node) in genome1.connections[0].keys() :
+                if node in secondary_nodes : 
+                    connections1[(previous_node, node)] = copy.deepcopy(genome1.connections[0][(previous_node, node)])
+            for node in genome1.biases[0].keys() :
+                if node in secondary_nodes :
+                    bias1[node] = copy.deepcopy(genome1.biases[0][node])
+            for node in genome1.functions[0].keys() :
+                if node in secondary_nodes :
+                    functions1[node] = copy.deepcopy(genome1.functions[0][node])
+            for node in genome1.dominances[0].keys() :
+                if node in secondary_nodes :
+                    dominances1[node] = copy.deepcopy(genome1.dominances[0][node])
+
+        # second chromosome
+        choice_second = np.random.randint(0, 2)
+        if choice_second == 0 :
+            for (previous_node, node) in genome1.connections[1].keys() :
+                if node in first_nodes :
+                    connections2[(previous_node, node)] = copy.deepcopy(genome1.connections[1][(previous_node, node)])
+            for node in genome1.biases[1].keys() :
+                if node in first_nodes :
+                    bias2[node] = copy.deepcopy(genome1.biases[1][node])
+            for node in genome1.functions[1].keys() :
+                if node in first_nodes :
+                    functions2[node] = copy.deepcopy(genome1.functions[1][node])
+            for node in genome1.dominances[1].keys() :
+                if node in first_nodes :
+                    dominances2[node] = copy.deepcopy(genome1.dominances[1][node])
+            for (previous_node, node) in genome2.connections[1].keys() :
+                if node in secondary_nodes :
+                    connections2[(previous_node, node)] = copy.deepcopy(genome2.connections[1][(previous_node, node)])
+            for node in genome2.biases[1].keys() :
+                if node in secondary_nodes :
+                    bias2[node] = copy.deepcopy(genome2.biases[1][node])
+            for node in genome2.functions[1].keys() :    
+                if node in secondary_nodes :
+                    functions2[node] = copy.deepcopy(genome2.functions[1][node])
+            for node in genome2.dominances[1].keys() :
+                if node in secondary_nodes :
+                    dominances2[node] = copy.deepcopy(genome2.dominances[1][node])
+
+        elif choice_second == 1 :
+            for (previous_node, node) in genome2.connections[1].keys() :
+                if node in first_nodes :
+                    connections2[(previous_node, node)] = copy.deepcopy(genome2.connections[1][(previous_node, node)])
+            for node in genome2.biases[1].keys() :
+                if node in first_nodes :
+                    bias2[node] = copy.deepcopy(genome2.biases[1][node])
+            for node in genome2.functions[1].keys() :
+                if node in first_nodes :
+                    functions2[node] = copy.deepcopy(genome2.functions[1][node])
+            for node in genome2.dominances[1].keys() :
+                if node in first_nodes :
+                    dominances2[node] = copy.deepcopy(genome2.dominances[1][node])
+            for (previous_node, node) in genome1.connections[1].keys() :
+                if node in secondary_nodes :
+                    connections2[(previous_node, node)] = copy.deepcopy(genome1.connections[1][(previous_node, node)])
+            for node in genome1.biases[1].keys() :
+                if node in secondary_nodes :
+                    bias2[node] = copy.deepcopy(genome1.biases[1][node])
+            for node in genome1.functions[1].keys() :
+                if node in secondary_nodes :
+                    functions2[node] = copy.deepcopy(genome1.functions[1][node])    
+            for node in genome1.dominances[1].keys() :
+                if node in secondary_nodes :
+                    dominances2[node] = copy.deepcopy(genome1.dominances[1][node])
+
+        connections = [connections1, connections2]
+        bias = [bias1, bias2]
+        functions = [functions1, functions2]
+        dominances = [dominances1, dominances2]
+
+        nodes = copy.deepcopy(genome1.nodes)
+    
+        return connections, bias, functions, dominances, nodes, choice_first, choice_second
 
 
     def mutate(self, genome, sigma_weight, sigma_bias, threshold_weight, threshold_bias, threshold_function, threshold_dominance, functions_pool) :
