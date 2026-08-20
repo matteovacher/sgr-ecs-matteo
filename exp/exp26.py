@@ -7,6 +7,7 @@ import copy
 from config import Config 
 
 from entity_manager import EntityManager 
+from tools import results_manager
 from world import World 
 
 
@@ -183,6 +184,11 @@ def render() :
     diploid_distance_tool = DistanceTool(diploid_config)
     haploid_distance_tool = DistanceTool(haploid_config)
 
+    diploid_genome_operator = GenomeOperator(diploid_config)
+    haploid_genome_operator = HaploidOperator(haploid_config)
+
+    # Here they are the same because same config
+
     while exit == False : 
         type_genome, action = results_manager.ask_both_action()
 
@@ -190,11 +196,13 @@ def render() :
             robot_simulator = diploid_robot_simulator
             network_manager = diploid_network_manager
             distance_tool = diploid_distance_tool
+            genome_operator = diploid_genome_operator
             config = diploid_config
         elif type_genome == 'haploid' :
             robot_simulator = haploid_robot_simulator
             network_manager = haploid_network_manager
             distance_tool = haploid_distance_tool
+            genome_operator = haploid_genome_operator
             config = haploid_config
         else :
             raise Exception('The type of genome is not valid')
@@ -330,9 +338,9 @@ def render() :
             exit = results_manager.compare_now_and_before(distance_tool, type_genome, config,
                     network_manager, SubstrateBuilder(config), PhenotypeBuilder(), RobotGenerator())
 
-        elif action == 'compare and save' : 
-            exit, Xs, Ys, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before = results_manager.compare_render_now_and_before(distance_tool, type_genome, config,
-                    network_manager, SubstrateBuilder(config), PhenotypeBuilder(), RobotGenerator())
+        elif action == 'compare and save' and type_genome == 'diploid' : 
+            exit, Xs, Ys, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before = results_manager.compare_chrom_render_now_and_before(distance_tool, type_genome, config,
+                    network_manager, SubstrateBuilder(config), PhenotypeBuilder(), RobotGenerator(), genome_operator)
 
             images_dir = os.path.join(results_manager.results_dir, type_genome, 'images')
             os.makedirs(images_dir, exist_ok=True)
@@ -365,6 +373,33 @@ def render() :
 
             print('\n----- Saved Successfully -----\n')
 
+        elif action == 'compare and save' and type_genome == 'haploid' :
+            exit, Xs, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before = results_manager.compare_hap_chrom_render_now_and_before(distance_tool, type_genome, config,
+                                network_manager, SubstrateBuilder(config), PhenotypeBuilder(), RobotGenerator(), genome_operator)
+
+            images_dir = os.path.join(results_manager.results_dir, type_genome, 'images')
+            os.makedirs(images_dir, exist_ok=True)
+            os.makedirs(os.path.join(images_dir, 'now'), exist_ok=True)
+            os.makedirs(os.path.join(images_dir, 'double_before'), exist_ok=True)
+            os.makedirs(os.path.join(images_dir, 'before'), exist_ok=True)
+
+            print('\n----- Saving the Images -----\n')
+
+            for i in range(len(Xs)) :
+                image_path = os.path.join(images_dir, 'now', 'gen_{}_{}.png'.format(generation, i))
+                image = robot_simulator.simulate_render_image_mode_env(Xs[i], env_now)
+                io.imwrite(image_path, image)
+
+            for i in range(len(Ws)) :
+                image_path = os.path.join(images_dir, 'double_before', 'gen_{}_{}.png'.format(gen_before_before, i))
+                image = robot_simulator.simulate_render_image_mode_env(Ws[i], env_now)
+                io.imwrite(image_path, image)
+
+            for i in range(len(Zs)) :
+                image_path = os.path.join(images_dir, 'before', 'gen_{}_{}.png'.format(gen_before, i))
+                image = robot_simulator.simulate_render_image_mode_env(Zs[i], env_before)
+                io.imwrite(image_path, image)
+        
         else : 
             exit = True 
         

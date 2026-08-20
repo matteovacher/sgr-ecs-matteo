@@ -5,8 +5,8 @@ import dill
 import time 
 import copy 
 import numpy as np 
+from components import BodyNetworkComponent, CPPNComponent
 
-from components import BodyNetworkComponent
 
 class ResultsManager :
 
@@ -1222,8 +1222,7 @@ class ResultsManager :
             return False
 
 
-    def compare_render_now_and_before(self, distance_tool, type_genome, config, network_manager,
-                           substrate_builder, phenotype_builder, robot_generator) :
+    def compare_render_now_and_before(self, distance_tool, type_genome, config, network_manager, substrate_builder, phenotype_builder, robot_generator) :
         generation = input("Here you'll compare the top (you decide) of this gen to the top (same here as before) of the other before switch, so that if we switch the input to the body ann, we can see if the solution is memorized or generalized ?\n Please generation : ")
         number = input(" Please indicate the number of the top you want to compare : ")
         generation = int(generation)
@@ -1336,7 +1335,192 @@ class ResultsManager :
         else : 
             return False, Xs, Ys, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before
         
+    def compare_chrom_render_now_and_before(self, distance_tool, type_genome, config, network_manager, substrate_builder, phenotype_builder, robot_generator, genome_operator) :
+        generation = input("Here you'll compare the top (you decide) of this gen to the top (same here as before) of the other before switch, so that if we switch the input to the body ann, we can see if the solution is memorized or generalized ?\n Please generation : ")
+        number = input(" Please indicate the number of the top you want to compare : ")
+        generation = int(generation)
+        number = int(number)
+        exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+    
+        self.pkl_dir = os.path.join(self.results_dir, type_genome, 'pkl')
 
+        gen_before =  (generation // config.switch) * config.switch - 1
+        gen_before_before = ((generation // config.switch) - 1) * config.switch - 1
+        env_now    = 0 if (generation // config.switch) % 2 == 0 else 1
+        env_before = 1 - env_now
+
+        def load(gen, name) :
+            with open(os.path.join(self.pkl_dir, '{}_{}.pkl'.format(gen, name)), 'rb') as f :
+                return dill.load(f)
+
+        genome_now, fit_now, body_now = load(generation, 'genome_registry'), load(generation, 'fitness_registry'), load(generation, 'body_registry')
+        genome_before, fit_before, body_before = load(gen_before, 'genome_registry'), load(gen_before, 'fitness_registry'), load(gen_before, 'body_registry')
+        genome_before_before, fit_before_before, body_before_before = load(gen_before_before, 'genome_registry'), load(gen_before_before, 'fitness_registry'), load(gen_before_before, 'body_registry')
+
+        def tops(fit_reg, n) :
+            keys = []
+            for k in fit_reg.keys() :
+                if fit_reg[k].fitness > -1000 :
+                    keys.append(k)
+
+            fitnesses = np.array([fit_reg[k].fitness for k in keys])
+            order = np.argsort(fitnesses)
+
+            bests = []
+            for taken in range(min(n, len(keys))) :
+                index = order[len(keys) - 1 - taken]
+                bests.append(keys[index])
+            return bests    
+
+        top_5before = tops(fit_before, number)
+        top_5before_before = tops(fit_before_before, number)
+
+        Zs = [body_before[k].body for k in top_5before]
+        Ws = [body_before_before[k].body for k in top_5before_before]
+
+        Xs = []
+        Ys = []
+        substrate = substrate_builder.shape_into_coordinates(substrate_builder.extract_former_body_network_shape(config))
+        for key in tops(fit_now, number) :
+            connections, bias, functions = genome_operator.signal_uniform_dominance_with_modu_regu(genome_now[key], env_before)
+            node_evals, input_nodes, output_nodes = network_manager.create_network_with_modu_regu(genome_now[key].nodes, connections, bias, functions, sum, response = 1)
+            cppn = CPPNComponent(node_evals, input_nodes, output_nodes)
+            act_func = np.tanh
+            out_act_func = np.tanh
+            node_evals, input_nodes, output_nodes = phenotype_builder.create_phenotype_network_without_bias_2_outputs(cppn, network_manager, substrate, act_func, out_act_func, sum, config.response, config.max_weight, config.max_bias, type_output = 0)
+            body_network = BodyNetworkComponent(node_evals, input_nodes, output_nodes)
+
+            X = body_now[key].body
+            Xs.append(X)
+
+            Y = robot_generator.generate_former_one_signal_robot_body_from_network_and_env(body_network, network_manager, config.body_shape, env_before)
+            Ys.append(Y)
+
+            connections_check, bias_check, functions_check = genome_operator.signal_uniform_dominance_with_modu_regu(genome_now[key], env_now)
+            node_evals_check, input_nodes_check, output_nodes_check = network_manager.create_network_with_modu_regu(genome_now[key].nodes, connections_check, bias_check, functions_check, sum, response = 1)
+            cppn_check = CPPNComponent(node_evals_check, input_nodes_check, output_nodes_check)
+            act_func_check = np.tanh
+            out_act_func_check = np.tanh
+            node_evals_check, input_nodes_check, output_nodes_check = phenotype_builder.create_phenotype_network_without_bias_2_outputs(cppn_check, network_manager, substrate, act_func_check, out_act_func_check, sum, config.response, config.max_weight, config.max_bias, type_output = 0)
+            body_network_check = BodyNetworkComponent(node_evals_check, input_nodes_check, output_nodes_check)
+
+            X_check = robot_generator.generate_former_one_signal_robot_body_from_network_and_env(
+            body_network_check, network_manager, config.body_shape, env_now)
+            print(np.array_equal(X, X_check))
+            
+
+        Xs = np.array(Xs)
+        Ys = np.array(Ys)
+        Zs = np.array(Zs)
+        Ws = np.array(Ws)
+
+        def distances_between(group1, group2) :
+            matrice = []
+            for body1 in group1 :
+                ligne = []
+                for body2 in group2 :
+                    ligne.append(distance_tool.phenotypic_body_distance(body1, body2)[1])
+                matrice.append(ligne)
+            return np.array(matrice)
+        
+        dXsbeforebefore = distances_between(Xs, Ws)
+        dYsbefore = distances_between(Ys, Zs)
+        refWs = distances_between(Ws, Ws)
+        refZs = distances_between(Zs, Zs)
+
+        dXsYs = []
+        for i in range(len(Xs)) :
+            dXsYs.append(distance_tool.phenotypic_body_distance(Xs[i], Ys[i])[1])
+
+        print('\n ----- Distances ----- \n')
+        for i in range(len(Xs)) :
+            print('Individual {} : its two bodies are at {} from each other ie this gen vs gen before with current genome'.format(i, round(dXsYs[i], 3)))
+            print('Its body of env {} is at {} of the best bodies of gen {}'.format(env_now, round(dXsbeforebefore[i].min(), 3), gen_before_before))
+            print('This is interessant : Its body of env {} is at {} of the best bodies of gen {} ie distance between the new created body and the body of generation bedore\n'.format(env_before, round(dYsbefore[i].min(), 3), gen_before))
+
+        print('\n ----- Bodies ----- \n')
+        for i in range(len(Xs)) :
+            print('Individual {} in env {} : \n'.format(i, env_now))
+            print(Xs[i])
+            print('The same one with the input of env {} : \n'.format(env_before))
+            print(Ys[i])
+            print('\n')
+        
+        print('\n ----- Best bodies of gen {} (env {}) ----- \n'.format(gen_before, env_before))
+        for Z in Zs :
+            print(Z)
+            print('\n')
+
+        print('\n ----- Best bodies of gen {} (env {}) ----- \n'.format(gen_before_before, env_now))
+        for W in Ws :
+            print(W)
+            print('\n')
+
+        if exit == "y" :
+            return True, Xs, Ys, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before
+        else : 
+            return False, Xs, Ys, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before
+
+    def compare_hap_chrom_render_now_and_before(self, distance_tool, type_genome, config, network_manager, substrate_builder, phenotype_builder, robot_generator, genome_operator) :
+            generation = input("Here you'll compare the top (you decide) of this gen to the top (same here as before) of the other before switch, so that if we switch the input to the body ann, we can see if the solution is memorized or generalized ?\n Please generation : ")
+            number = input(" Please indicate the number of the top you want to compare : ")
+            generation = int(generation)
+            number = int(number)
+            exit = input("Do you want to exit the program ? \n \t [y] / [n] \n \t")
+        
+            self.pkl_dir = os.path.join(self.results_dir, type_genome, 'pkl')
+    
+            gen_before =  (generation // config.switch) * config.switch - 1
+            gen_before_before = ((generation // config.switch) - 1) * config.switch - 1
+            env_now    = 0 if (generation // config.switch) % 2 == 0 else 1
+            env_before = 1 - env_now
+    
+            def load(gen, name) :
+                with open(os.path.join(self.pkl_dir, '{}_{}.pkl'.format(gen, name)), 'rb') as f :
+                    return dill.load(f)
+    
+            fit_now, body_now = load(generation, 'fitness_registry'), load(generation, 'body_registry')
+            fit_before, body_before = load(gen_before, 'fitness_registry'), load(gen_before, 'body_registry')
+            fit_before_before, body_before_before = load(gen_before_before, 'fitness_registry'), load(gen_before_before, 'body_registry')
+    
+            def tops(fit_reg, n) :
+                keys = []
+                for k in fit_reg.keys() :
+                    if fit_reg[k].fitness > -1000 :
+                        keys.append(k)
+    
+                fitnesses = np.array([fit_reg[k].fitness for k in keys])
+                order = np.argsort(fitnesses)
+    
+                bests = []
+                for taken in range(min(n, len(keys))) :
+                    index = order[len(keys) - 1 - taken]
+                    bests.append(keys[index])
+                return bests    
+    
+            top_5before = tops(fit_before, number)
+            top_5before_before = tops(fit_before_before, number)
+    
+            Zs = [body_before[k].body for k in top_5before]
+            Ws = [body_before_before[k].body for k in top_5before_before]
+    
+            Xs = []
+            Ys = []
+            
+            for key in tops(fit_now, number) :
+    
+                X = body_now[key].body
+                Xs.append(X)
+    
+            Xs = np.array(Xs)
+            Zs = np.array(Zs)
+            Ws = np.array(Ws)
+
+    
+            if exit == "y" :
+                return True, Xs, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before
+            else : 
+                return False, Xs, Zs, Ws, generation, gen_before, gen_before_before, env_now, env_before
         
     def print_distance(self, distance_tool) :
         generation1 = input('Please indicate the generation of the first individual : ')

@@ -1689,7 +1689,7 @@ class BothSignalUniformEnvModular2WiBiPhenotypeSystem :
             out_act_func = lambda x : 0.5*np.tanh(x) + 1.1
             for entity_id in valid_ids :
                 observation_size = size_of.get(entity_id, -1000)
-                if observation_size <= 0 :   # sonde échouée/timeout → traité comme invalide
+                if observation_size <= 0 :   # sonde échouée/timeout -> traité comme invalide
                     fitness, finished  = -1000, True
                     registry.add_fitness(entity_id, fitness, finished)
                     if registry.has_controller_network(entity_id) :
