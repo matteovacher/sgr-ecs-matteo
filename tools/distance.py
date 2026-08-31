@@ -86,6 +86,7 @@ class DistanceTool :
         return np.array_equal(out1, out2)
 
     def distance_expressed_genome(self, node_evals1, node_evals2) :
+        
         act_functions_distance = 0 
         weight_distance = 0 
         bias_distance = 0
@@ -117,11 +118,9 @@ class DistanceTool :
         normalized_weight_distance = weight_distance / (count_weight * 2 * self.config.range_weight)
         normalized_bias_distance = bias_distance / (count_bias * 2 * self.config.range_bias)
 
-        
 
-    
         return act_functions_distance, weight_distance, bias_distance, normnalized_act_functions_distance, normalized_weight_distance, normalized_bias_distance
 
 
-            
+        
                 
