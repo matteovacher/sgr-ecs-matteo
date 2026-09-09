@@ -3,6 +3,8 @@ import json
 import time
 import imageio as io 
 import copy 
+import numpy as np
+import random as rd 
 
 from config import Config 
 
@@ -45,6 +47,9 @@ def main() :
         config = json.load(f)
 
     config = Config(config)
+    np.random.seed(config.seed)
+    rd.seed(config.seed)
+
     results_manager = ResultsManager()
 
     whole_time = time.time()
@@ -76,7 +81,7 @@ def main() :
             time1 = time.time()
 
             genome_operator = GenomeOperator(config)
-
+            
             build_system = BothUniformModularBuildSystem(config, entity_manager, genome_operator, results_manager, function_pool, type_genome)
             phenotype_system = BothSignalUniformEnvModular2WiBiPhenotypeSystem(config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome, type_env)
             evaluation_system = BothEnvEvaluationSystem(config, robot_simulator, network_manager, parallel_tool, entity_manager, results_manager, type_genome, type_env)

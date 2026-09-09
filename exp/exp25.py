@@ -3,6 +3,8 @@ import json
 import time
 import imageio as io 
 import copy 
+import numpy as np 
+import random as rd 
 
 from config import Config 
 
@@ -44,6 +46,9 @@ def main() :
         config = json.load(f)
 
     config = Config(config)
+    np.random.seed(config.seed)
+    rd.seed(config.seed)
+
     results_manager = ResultsManager()
 
     whole_time = time.time()
