@@ -1,8 +1,8 @@
 
 {
     "body_shape" : [5, 5], 
-    "max_weight" : 2, 
-    "max_bias" : 2,
+    "max_weight" : 3, 
+    "max_bias" : 3,
     "response" : 1, 
 
     "max_weight_cppn" : 20,
