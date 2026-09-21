@@ -1,5 +1,5 @@
 {
-    "seed" : 3, 
+    "seed" : 2, 
 
     "number_of_exp" : 5, 
     "number_of_config" : 1, 
@@ -36,11 +36,11 @@
 
     "function_pool" : ["gaussian", "sin", "tanh"], 
 
-    "n_steps" : [1000, 500], 
+    "n_steps" : [350, 1000], 
     "number_of_reported_individuals" : 40,
 
     "cpus" : 15, 
 
-    "env_name" : ["Pusher-v0", "Walker-v0"]
+    "env_name" : ["Thrower-v0", "Pusher-v0"]
 
 }

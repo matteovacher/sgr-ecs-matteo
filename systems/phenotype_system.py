@@ -1387,7 +1387,7 @@ class BothOtherEnvModular2WiBiPhenotypeSystem :
 class BothUniformEnvModular2WiBiPhenotypeSystem :
 
     def __str__(self) :
-        return "Modular BothPhenotypeSystem, build the phenotype from the genome with simple dominance, with 2 outputs, without biases and and with new genome in 5d not in 3  with other logical rules and mor importantly with uniform distributiopn at the beggining of the algorithm ie between 0 and 1 as float "
+        return "Modular BothPhenotypeSystem, build the phenotype from the genome with simple dominance, with 2 outputs, without biases and and with new genome in 5d not in 3  with other logical rules and mor importantly with uniform distributiopn at the beggining of the algorithm ie between 0 and 1 as float, used for developmental plasticity "
     
     def __init__(self, config, entity_manager, genome_operator, network_manager, substrate_builder, phenotype_builder, function_pool, robot_generator, robot_simulator, results_manager, type_genome, type_env ) :
         self.generation = 1
